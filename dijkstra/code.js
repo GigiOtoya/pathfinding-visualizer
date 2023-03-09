@@ -3,6 +3,7 @@ const ctx = canvas.getContext("2d");
 canvas.width = 1280;
 canvas.height = 720;
 
+let nodes = [];
 let visited = [];
 let unvisited = [];
 
@@ -11,7 +12,11 @@ edgeBtn = document.getElementById("add-edge-btn");
 
 // Event Listeners
 nodeBtn.addEventListener("click", addNode);
-
+// document.addEventListener("mousemove", onNode);
+canvas.addEventListener("mousemove", (e) => {
+    let mouseEvent = e;
+    getMousePos(canvas, mouseEvent);
+});
 
 function drawCanvas() {
     ctx.fillStyle = "#1b1b1b";
@@ -21,12 +26,11 @@ function drawCanvas() {
     let n1 = new Node(canvas.width / 2, canvas.height / 2 - 100, 30);
     let n2 = new Node(canvas.width / 2 - 100, canvas.height / 2, 30);
     let n3 = new Node(canvas.width / 2 + 100, canvas.height / 2, 30);
-    n1.drawNode();
-    n2.drawNode();
-    n3.drawNode();
+    nodes.push(n1,n2,n3);
+    nodes.forEach(node => node.drawNode());
 }
 
-// Circle constructor
+// Circle constructorjh
 function Node(x, y, r) {
     this.x = x;
     this.y = y;
@@ -41,6 +45,17 @@ function Node(x, y, r) {
         ctx.fill();
         ctx.stroke();
     };
+};
+
+// function onNode(e) {
+//     let x = e.clientX;
+//     let y = e.clientY;
+//     console.log(e.target);
+// }
+
+function getMousePos(canvas, e) {
+    let boundingRect = canvas.getBoundingClientRect();
+    console.log(e.clientX - boundingRect.x);
 };
 
 // Button functions
