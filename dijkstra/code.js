@@ -1,4 +1,7 @@
 const canvas = document.getElementById("canvas");
+canvas.width = 1280;
+canvas.height = 720;
+
 
 function drawCanvas() {
     const ctx = canvas.getContext("2d");
