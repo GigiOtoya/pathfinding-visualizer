@@ -16,6 +16,14 @@ nodeBtn.addEventListener("click", addNode);
 function drawCanvas() {
     ctx.fillStyle = "#1b1b1b";
     ctx.fillRect(0, 0, canvas.clientWidth, canvas.height);
+
+    // initial nodes
+    let n1 = new Node(canvas.width / 2, canvas.height / 2 - 100, 30);
+    let n2 = new Node(canvas.width / 2 - 100, canvas.height / 2, 30);
+    let n3 = new Node(canvas.width / 2 + 100, canvas.height / 2, 30);
+    n1.drawNode();
+    n2.drawNode();
+    n3.drawNode();
 }
 
 // Circle constructor
@@ -38,7 +46,7 @@ function Node(x, y, r) {
 // Button functions
 function addNode(e) {
     e.preventDefault();
-    let node = new Node(canvas.width / 2, canvas.height / 2, 50);
+    let node = new Node(canvas.width / 2, canvas.height / 2, 30);
     node.drawNode();
 };
 
