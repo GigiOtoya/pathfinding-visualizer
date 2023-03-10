@@ -26,9 +26,10 @@ canvas.addEventListener("mouseup", mouseUp);
 
 // Functions
 function initialize() {// initial nodes
-    let n1 = new Node(canvas.width / 2, canvas.height / 2 - 100, 30);
-    let n2 = new Node(canvas.width / 2 - 100, canvas.height / 2, 30);
-    let n3 = new Node(canvas.width / 2 + 100, canvas.height / 2, 30);
+    const r = 20;
+    let n1 = new Node(canvas.width / 2, canvas.height / 2 - 100, r);
+    let n2 = new Node(canvas.width / 2 - 100, canvas.height / 2, r);
+    let n3 = new Node(canvas.width / 2 + 100, canvas.height / 2, r);
     nodes.push(n1,n2,n3);
     drawCanvas();
 }
@@ -58,19 +59,27 @@ function Node(x, y, r) {
 };
 
 function mouseMove(canvas, e) {
-    if (!draggable) {
-        
-    }
     let boundingRect = canvas.getBoundingClientRect();
     let x2 = Math.max(0, Math.round(e.clientX - boundingRect.x));
     let y2 = Math.round(e.clientY - boundingRect.y);
 
-    draggableNode = nodes.find(node => {
-        let x1 = node.x;
-        let y1 = node.y;
+    // draggableNode = nodes.find(node => {
+    //     let x1 = node.x;
+    //     let y1 = node.y;
+    //     let d = Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
+    //     return d <= node.r;
+    // });
+
+    for (let i=0; i<nodes.length; i++) {
+        let x1 = nodes[i].x;
+        let y1 = nodes[i].y;
         let d = Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
-        return d <= node.r;
-    });
+
+        if (d <= nodes[i].r) {
+            draggableNode = nodes[i];
+            break;
+        }
+    }
     canvas.style.cursor = draggableNode? "grab" : "default";
 
     if (draggable) {
