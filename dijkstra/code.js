@@ -48,7 +48,7 @@ function Node(x, y, r) {
     
     this.drawNode = function() {
         ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI *2);
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI *2);
         ctx.fillStyle = "lightsteelBlue";
         ctx.strokeStyle = "white";
         ctx.lineWidth = 3;
@@ -58,6 +58,9 @@ function Node(x, y, r) {
 };
 
 function mouseMove(canvas, e) {
+    if (!draggable) {
+        
+    }
     let boundingRect = canvas.getBoundingClientRect();
     let x2 = Math.max(0, Math.round(e.clientX - boundingRect.x));
     let y2 = Math.round(e.clientY - boundingRect.y);
@@ -73,7 +76,8 @@ function mouseMove(canvas, e) {
     if (draggable) {
         draggableNode.x = Math.max(0, Math.round(e.clientX - boundingRect.x));
         draggableNode.y = Math.round(e.clientY - boundingRect.y);
-        
+        nodes.forEach(node => console.log(`x: ${node.x}, y: ${node.y}`));
+        console.log(draggableNode);
         drawCanvas();
     };
 };
