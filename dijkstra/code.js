@@ -55,7 +55,9 @@ function Node(x, y, r) {
 
 function getMousePos(canvas, e) {
     let boundingRect = canvas.getBoundingClientRect();
-    console.log(e.clientX - boundingRect.x);
+    let x = Math.max(0, Math.round(e.clientX - boundingRect.x));
+    let y = Math.round(e.clientY - boundingRect.y);
+    console.log(`x: ${x}, y: ${y}`);
 };
 
 // Button functions
