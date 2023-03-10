@@ -1,5 +1,6 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+let draggable = false;
 canvas.width = 1280;
 canvas.height = 720;
 
@@ -59,19 +60,14 @@ function getMousePos(canvas, e) {
     let y2 = Math.round(e.clientY - boundingRect.y);
     console.log(`x: ${x2}, y: ${y2}`);
     
-    nodes.forEach(node => {
+    draggable = nodes.find(node => {
         let x1 = node.x;
         let y1 = node.y;
         let d = Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
-
-        if (d <= node.r) {
-            console.log("true")
-        }
-        else {
-            console.log("false");
-        }
-        
+        return d <= node.r;
     });
+    console.log(draggable);
+    canvas.style.cursor = draggable? "pointer" : "default";
 };
 
 // Button functions
