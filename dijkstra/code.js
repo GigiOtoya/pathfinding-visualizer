@@ -69,25 +69,7 @@ function mouseMove(canvas, e) {
     let boundingRect = canvas.getBoundingClientRect();
     let x2 = Math.max(0, Math.round(e.clientX - boundingRect.x));
     let y2 = Math.round(e.clientY - boundingRect.y);
-
-    // draggableNode = nodes.find(node => {
-    //     let x1 = node.x;
-    //     let y1 = node.y;
-    //     let d = Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
-    //     return d <= node.r;
-    // });
-
-    for (let i=0; i<nodes.length; i++) {
-        let x1 = nodes[i].x;
-        let y1 = nodes[i].y;
-        let d = Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
-
-        if (d <= nodes[i].r) {
-            draggableNode = nodes[i];
-            break;
-        };
-    }
-    console.log(draggableNode);
+    
     canvas.style.cursor = draggableNode? "grab" : "default";
 
     if (draggable) {
@@ -111,13 +93,17 @@ function mouseUp(e) {
     console.log(draggable);
 };
 
-function mouseOnNode() {
-    if (draggableNode) {
-        return true;
+function mouseOnNode(x2, y2) {
+    for (let i=0; i<nodes.length; i++) {
+        let x1 = nodes[i].x;
+        let y1 = nodes[i].y;
+        let d = Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
+
+        if (d <= nodes[i].r) {
+            return true;
+        }
     }
-    else {
-        return false;
-    }
+    return false;
 };
 
 // Button functions
