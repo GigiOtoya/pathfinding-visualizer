@@ -4,11 +4,13 @@ const ctx = canvas.getContext("2d");
 
 let onNode = false;
 let dragging = false;
+let addingEdge = false;
 let currNode = null;
 canvas.width = 1280;
 canvas.height = 720;
 
 let nodes = [];
+let edges = [];
 let visited = [];
 let unvisited = [];
 
@@ -17,7 +19,7 @@ edgeBtn = document.getElementById("add-edge-btn");
 
 // Event Listeners
 nodeBtn.addEventListener("click", addNode);
-// document.addEventListener("mousemove", onNode);
+edgeBtn.addEventListener("click", addEdge);
 canvas.addEventListener("mousemove", (e) => {
     let mouseEvent = e;
     mouseMove(canvas, mouseEvent);
@@ -30,9 +32,11 @@ canvas.addEventListener("mouseup", mouseUp);
 function initialize() {// initial nodes
     const r = 20;
     let n1 = new Node(canvas.width / 2, canvas.height / 2 - 100, r);
+    nodes.push(n1);
     let n2 = new Node(canvas.width / 2 - 100, canvas.height / 2, r);
+    nodes.push(n2);
     let n3 = new Node(canvas.width / 2 + 100, canvas.height / 2, r);
-    nodes.push(n1,n2,n3);
+    nodes.push(n3);
     drawCanvas();
 }
 
@@ -47,7 +51,7 @@ function drawCanvas() {
 function Node(x, y, r) {
     this.x = x;
     this.y = y;
-    this.r = r;
+    this.r = r;    
     this.name = String.fromCharCode(65 + nodes.length);
     
     this.drawNode = function() {
@@ -139,4 +143,9 @@ function addNode(e) {
     node.drawNode();
 };
 
+function addEdge(e) {
+    e.preventDefault();
+    addingEdge = true;
+
+}
 initialize();
