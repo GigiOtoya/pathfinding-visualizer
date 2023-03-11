@@ -46,6 +46,7 @@ function Node(x, y, r) {
     this.x = x;
     this.y = y;
     this.r = r;
+    this.name = String.fromCharCode(65 + nodes.length);
     
     this.drawNode = function() {
         ctx.beginPath();
@@ -55,6 +56,12 @@ function Node(x, y, r) {
         ctx.lineWidth = 3;
         ctx.fill();
         ctx.stroke();
+
+        ctx.fillStyle = "black";
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "center";
+        ctx.font = "20px sans-serif";
+        ctx.fillText(this.name, this.x, this.y);
     };
 };
 
@@ -78,8 +85,9 @@ function mouseMove(canvas, e) {
         if (d <= nodes[i].r) {
             draggableNode = nodes[i];
             break;
-        }
+        };
     }
+    console.log(draggableNode);
     canvas.style.cursor = draggableNode? "grab" : "default";
 
     if (draggable) {
@@ -88,7 +96,7 @@ function mouseMove(canvas, e) {
         nodes.forEach(node => console.log(`x: ${node.x}, y: ${node.y}`));
         console.log(draggableNode);
         drawCanvas();
-    };
+    }
 };
 
 function mouseDown(e) {
@@ -115,7 +123,7 @@ function mouseOnNode() {
 // Button functions
 function addNode(e) {
     e.preventDefault();
-    let node = new Node(canvas.width / 2, canvas.height / 2, 30);
+    let node = new Node(canvas.width / 2, canvas.height / 2, 20);
     nodes.push(node);
     node.drawNode();
 };
