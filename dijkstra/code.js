@@ -1,8 +1,10 @@
 const canvas = document.getElementById("canvas");
+const boundingRect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext("2d");
 
-let draggableNode;
-let draggable = false;
+let onNode = false;
+let dragging = false;
+let currNode = null;
 canvas.width = 1280;
 canvas.height = 720;
 
@@ -66,31 +68,41 @@ function Node(x, y, r) {
 };
 
 function mouseMove(canvas, e) {
-    let boundingRect = canvas.getBoundingClientRect();
-    let x2 = Math.max(0, Math.round(e.clientX - boundingRect.x));
-    let y2 = Math.round(e.clientY - boundingRect.y);
+    let mouseX = Math.max(0, Math.round(e.clientX - boundingRect.x));
+    let mouseY = Math.round(e.clientY - boundingRect.y);
     
-    canvas.style.cursor = draggableNode? "grab" : "default";
+    // keep currNode from changing once we have it
+    if (mouseOnNode(mouseX, mouseY)) {
+        onNode = true;
+        canvas.style.cursor = "grab";
+    }
+    else {
+        onNode = false;
+        canvas.style.cursor = "default";
+    }
 
-    if (draggable) {
-        draggableNode.x = Math.max(0, Math.round(e.clientX - boundingRect.x));
-        draggableNode.y = Math.round(e.clientY - boundingRect.y);
+    if (dragging) {
+        currNode.x = mouseX;
+        currNode.y = mouseY;
         nodes.forEach(node => console.log(`x: ${node.x}, y: ${node.y}`));
-        console.log(draggableNode);
+        console.log(currNode);
         drawCanvas();
     }
 };
 
 function mouseDown(e) {
     e.preventDefault();
-    draggable = mouseOnNode()? true : false;
-    console.log(draggable);
+    dragging = onNode;
+    let mouseX = Math.max(0, Math.round(e.clientX - boundingRect.x));
+    let mouseY = Math.round(e.clientY - boundingRect.y);
+    currNode = getNode(mouseX, mouseY);
+    console.log(dragging);
 };
 
 function mouseUp(e) {
     e.preventDefault();
-    draggable = false;
-    console.log(draggable);
+    dragging = false;
+    console.log(dragging);
 };
 
 function mouseOnNode(x2, y2) {
@@ -100,10 +112,23 @@ function mouseOnNode(x2, y2) {
         let d = Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
 
         if (d <= nodes[i].r) {
-            return true;
+            return true
         }
     }
     return false;
+}
+
+function getNode(x2, y2) {
+    for (let i=0; i<nodes.length; i++) {
+        let x1 = nodes[i].x;
+        let y1 = nodes[i].y;
+        let d = Math.sqrt((x2 - x1)**2 + (y2 - y1)**2);
+
+        if (d <= nodes[i].r) {
+            return nodes[i];
+        }
+    }
+    return null;
 };
 
 // Button functions
