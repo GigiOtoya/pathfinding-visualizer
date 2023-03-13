@@ -146,6 +146,6 @@ function addNode(e) {
 function addEdge(e) {
     e.preventDefault();
     addingEdge = true;
-
+    
 }
 initialize();
