@@ -2,6 +2,7 @@ const canvas = document.getElementById("canvas");
 const boundingRect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext("2d");
 
+let graph;
 let onNode = false;
 let dragging = false;
 let addingEdge = false;
@@ -14,10 +15,12 @@ let edges = [];
 let visited = [];
 let unvisited = [];
 
+selectBtn = document.getElementById("select-btn");
 nodeBtn = document.getElementById("add-node-btn");
 edgeBtn = document.getElementById("add-edge-btn");
 
 // Event Listeners
+selectBtn.addEventListener("click", select);
 nodeBtn.addEventListener("click", addNode);
 edgeBtn.addEventListener("click", addEdge);
 canvas.addEventListener("mousemove", (e) => {
@@ -85,6 +88,10 @@ function mouseMove(canvas, e) {
         canvas.style.cursor = "default";
     }
 
+    if (addingEdge) {
+        canvas.style.cursor = "crosshair";
+    }
+
     if (dragging) {
         currNode.x = mouseX;
         currNode.y = mouseY;
@@ -96,15 +103,27 @@ function mouseMove(canvas, e) {
 
 function mouseDown(e) {
     e.preventDefault();
-    dragging = onNode;
+    dragging = addingEdge? false : onNode;
+    
     let mouseX = Math.max(0, Math.round(e.clientX - boundingRect.x));
     let mouseY = Math.round(e.clientY - boundingRect.y);
     currNode = getNode(mouseX, mouseY);
-    console.log(dragging);
+
+    if (addingEdge) {
+        edges.push(currNode);
+    }
+    console.log(`dragging: ${dragging}, addingEdge: ${addingEdge}`);
 };
 
 function mouseUp(e) {
     e.preventDefault();
+    if (addingEdge) {
+        let mouseX = Math.max(0, Math.round(e.clientX - boundingRect.x));
+        let mouseY = Math.round(e.clientY - boundingRect.y);
+        currNode = getNode(mouseX, mouseY);
+        edges.push(currNode);
+        console.log("edge added");
+    }
     dragging = false;
     console.log(dragging);
 };
@@ -136,6 +155,11 @@ function getNode(x2, y2) {
 };
 
 // Button functions
+function select(e) {
+    e.preventDefault();
+    addingEdge = false;
+}
+
 function addNode(e) {
     e.preventDefault();
     let node = new Node(canvas.width / 2, canvas.height / 2, 20);
@@ -145,7 +169,16 @@ function addNode(e) {
 
 function addEdge(e) {
     e.preventDefault();
-    addingEdge = true;
+    addingEdge = true;   
+}
+
+function createEdge(node1, node2) {
+    if (node1 && node2) {
+        console.log("true");
+    }
+}
+// Graph
+function buildGraph() {
     
 }
 initialize();
