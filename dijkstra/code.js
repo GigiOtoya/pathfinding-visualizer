@@ -34,8 +34,9 @@ canvas.addEventListener("mouseup", mouseUp);
 function initialize() {
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
-    
+
     graph = new Map();
+
     const r = 20;
     let n1 = new Node(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100, r);
     nodes.push(n1);
@@ -44,8 +45,22 @@ function initialize() {
     let n3 = new Node(CANVAS_WIDTH / 2 + 100, CANVAS_HEIGHT / 2, r);
     nodes.push(n3);
 
-    
+    insertNodeToGraph(n1);
+    insertNodeToGraph(n2);
+    insertNodeToGraph(n3);
+    addEdgeToGraph(n1,n2);
+    addEdgeToGraph(n1,n3);
+    addEdgeToGraph(n2,n3);
     drawCanvas();
+}
+
+function insertNodeToGraph(node) {
+    graph.set(node, new Map());
+}
+
+function addEdgeToGraph(node1, node2) {
+    graph.get(node1).set(node2, 5);
+    graph.get(node2).set(node1, 1);
 }
 
 function drawCanvas() {
