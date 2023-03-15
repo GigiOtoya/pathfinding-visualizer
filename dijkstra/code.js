@@ -54,13 +54,21 @@ function initialize() {
     drawCanvas();
 }
 
+// Graph functions
 function insertNodeToGraph(node) {
     graph.set(node, new Map());
 }
 
 function addEdgeToGraph(node1, node2) {
-    graph.get(node1).set(node2, 5);
-    graph.get(node2).set(node1, 1);
+    const distance = getDistance(node1, node2);
+    graph.get(node1).set(node2, distance);
+    graph.get(node2).set(node1, distance);
+}
+
+function getDistance(node1, node2) {
+    const deltaX = node2.x - node1.x;
+    const deltaY = node2.y - node2.y;
+    return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
 }
 
 function drawCanvas() {
