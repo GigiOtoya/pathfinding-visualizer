@@ -61,6 +61,7 @@ function insertNodeToGraph(node) {
 
 function addEdgeToGraph(node1, node2) {
     const distance = getDistance(node1, node2);
+    // distance set for both nodes connected by edge
     graph.get(node1).set(node2, distance);
     graph.get(node2).set(node1, distance);
 }
@@ -69,6 +70,15 @@ function getDistance(node1, node2) {
     const deltaX = node2.x - node1.x;
     const deltaY = node2.y - node2.y;
     return Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+}
+
+function updateEdgeDistance(node) {
+    // get map of nodes connected to node
+    const neighbors = graph.get(node);
+    // update distances
+    for (let neighbor of neighbors.keys()) {
+        addEdgeToGraph(node, neighbor);
+    }
 }
 
 function drawCanvas() {
@@ -124,6 +134,7 @@ function mouseMove(canvas, e) {
         currNode.x = mouseX;
         currNode.y = mouseY;
         nodes.forEach(node => console.log(`x: ${node.x}, y: ${node.y}`));
+        updateEdgeDistance(currNode);
         console.log(currNode);
         drawCanvas();
     }
