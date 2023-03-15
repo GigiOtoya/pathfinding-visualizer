@@ -85,10 +85,25 @@ function drawCanvas() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     ctx.fillStyle = "#1b1b1b";
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 3;
+    drawEdges();
     nodes.forEach(node => node.drawNode());
 }
 
-// Circle constructor
+function drawEdges() {
+    for (let node of graph.keys()) {
+        neighbors = graph.get(node);
+        for (let neighbor of neighbors.keys()) {
+            ctx.beginPath();
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(neighbor.x, neighbor.y);
+            ctx.stroke();
+        }
+    }
+}
+
+// Node constructor
 function Node(x, y, r) {
     this.x = x;
     this.y = y;
@@ -205,6 +220,7 @@ function addNode(e) {
     e.preventDefault();
     let node = new Node(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 20);
     nodes.push(node);
+    graph.set(node, new Map());
     node.drawNode();
 };
 
