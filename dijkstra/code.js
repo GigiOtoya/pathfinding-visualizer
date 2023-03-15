@@ -12,7 +12,7 @@ let addingEdge = false;
 let currNode = null;
 
 let nodes = [];
-let edges = [];
+let edgeSet = {};
 
 selectBtn = document.getElementById("select-btn");
 nodeBtn = document.getElementById("add-node-btn");
@@ -85,8 +85,6 @@ function drawCanvas() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     ctx.fillStyle = "#1b1b1b";
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 3;
     drawEdges();
     nodes.forEach(node => node.drawNode());
 }
@@ -98,6 +96,8 @@ function drawEdges() {
             ctx.beginPath();
             ctx.moveTo(node.x, node.y);
             ctx.lineTo(neighbor.x, neighbor.y);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "white";
             ctx.stroke();
         }
     }
@@ -226,7 +226,7 @@ function addNode(e) {
 
 function addEdge(e) {
     e.preventDefault();
-    addingEdge = true;   
+    addingEdge = true;
 }
 
 function createEdge(node1, node2) {
@@ -234,6 +234,30 @@ function createEdge(node1, node2) {
         console.log("true");
     }
 }
+
+function addToEdgeSet(node1, node2) {
+    const nodeValue1 = node1.name.charCodeAt();
+    const nodeValue2 = node2.name.charCodeAt();
+    const min = Math.min(nodeValue1, nodeValue2);
+
+    let start;
+    let end;
+
+    if (nodeValue1 == min) {
+        start = node1.name;
+        end = node2.name;
+    }
+    else {
+        start = node2.name;
+        end = node1.name;
+    }
+
+    const key = `${start}-${end}`; 
+    if(!edgeSet[key]) {
+        edgeSet[key] = {node1, node2};
+    }
+}
+
 // Graph
 function buildGraph() {
     let visited = [];
