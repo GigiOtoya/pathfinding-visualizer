@@ -4,6 +4,7 @@ const ctx = canvas.getContext("2d");
 
 const CANVAS_WIDTH = 1280;
 const CANVAS_HEIGHT = 720;
+const DARK_PASTEL = "#1b1b1b"
 
 let graph;
 let onNode = false;
@@ -87,7 +88,7 @@ function updateEdgeDistance(node) {
 
 function drawCanvas() {
     ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-    ctx.fillStyle = "#1b1b1b";
+    ctx.fillStyle = DARK_PASTEL;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     drawEdges();
     nodes.forEach(node => node.drawNode());
