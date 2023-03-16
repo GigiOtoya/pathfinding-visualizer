@@ -59,6 +59,30 @@ function initialize() {
     drawCanvas();
 }
 
+// Graph Class
+function Graph() {
+    this.adjacencyList = new Map();
+
+    this.insertNodeToGraph = function (node) {
+        this.adjacencyList.set(node, new Map());
+    };
+
+    this.addEdgeToGraph = function (source, neighbor) {
+        const distance = getDistance(source, neighbor);
+        // distance set for both nodes connected by edge
+        this.adjacencyList.get(source).set(neighbor, distance);
+        this.adjacencyList.get(neighbor).set(source, distance);
+    };
+
+    this.printGraph = function() {
+        for (let node of this.adjacencyList.keys()) {
+            const edges = this.adjacencyList.get(node);
+            console.log(`${node.name}: ${edges}`);
+        }
+    };
+
+}
+
 // Graph functions
 function insertNodeToGraph(node) {
     graph.set(node, new Map());
@@ -275,9 +299,21 @@ function addToEdgeSet(node1, node2) {
 }
 
 // Graph
-function buildGraph() {
-    let visited = [];
-    let unvisited = [];
 
+
+
+function buildGraph() {
+    // let visited = [];
+    // let unvisited = [];
+
+    const g = new Graph();
+    for (let i=0; i<nodes.length; i++) {
+        g.insertNodeToGraph(nodes[i]);
+    }
+    edges = Object.values(edgeSet);
+    for (let i=0; i<edges.length; i++) {
+        g.addEdgeToGraph(edges[i].node1, edges[i].node2);
+    }
+    return g;
 }
 initialize();
