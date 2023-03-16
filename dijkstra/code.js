@@ -51,6 +51,10 @@ function initialize() {
     addEdgeToGraph(n1,n2);
     addEdgeToGraph(n1,n3);
     addEdgeToGraph(n2,n3);
+
+    addToEdgeSet(n1,n2);
+    addToEdgeSet(n1,n3);
+    addToEdgeSet(n2,n3);
     drawCanvas();
 }
 
@@ -90,16 +94,27 @@ function drawCanvas() {
 }
 
 function drawEdges() {
-    for (let node of graph.keys()) {
-        neighbors = graph.get(node);
-        for (let neighbor of neighbors.keys()) {
-            ctx.beginPath();
-            ctx.moveTo(node.x, node.y);
-            ctx.lineTo(neighbor.x, neighbor.y);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "white";
-            ctx.stroke();
-        }
+    // for (let node of graph.keys()) {
+    //     neighbors = graph.get(node);
+    //     for (let neighbor of neighbors.keys()) {
+    //         ctx.beginPath();
+    //         ctx.moveTo(node.x, node.y);
+    //         ctx.lineTo(neighbor.x, neighbor.y);
+    //         ctx.lineWidth = 2;
+    //         ctx.strokeStyle = "white";
+    //         ctx.stroke();
+    //     }
+    // }
+    let edges = Object.values(edgeSet);
+    for (let i=0; i<edges.length; i++) {
+        node1 = edges[i].node1;
+        node2 = edges[i].node2;
+        ctx.beginPath();
+        ctx.moveTo(node1.x, node1.y);
+        ctx.lineTo(node2.x, node2.y);
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "white";
+        ctx.stroke();
     }
 }
 
