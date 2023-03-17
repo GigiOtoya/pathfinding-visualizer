@@ -4,11 +4,15 @@ const ctx = canvas.getContext("2d");
 
 const CANVAS_WIDTH = 1280;
 const CANVAS_HEIGHT = 720;
+const DOTTED_LINE = [10,10];
+const STRAIGHT_LINE = [];
 const DARK_PASTEL = "#1b1b1b"
+const MINT = "#3BB3A0";
 
 let onNode = false;
 let dragging = false;
 let addingEdge = false;
+let drawingEdge = false;
 let currNode = null;
 
 let nodes = [];
@@ -166,12 +170,18 @@ function drawCanvas() {
     drawEdges();
     drawNodes();
 }
+function resetCanvas(){
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.fillStyle = DARK_PASTEL;
+    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+}
 
 function drawNodes() {
     for (let i=0; i<nodes.length; i++) {
         ctx.beginPath();
+        ctx.setLineDash(STRAIGHT_LINE);   
         ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r, 0, Math.PI * 2);
-        ctx.fillStyle = "lightsteelblue";
+        ctx.fillStyle = MINT;
         ctx.strokeStyle = "white";
         ctx.lineWidth = 3;
         ctx.fill();
@@ -180,11 +190,20 @@ function drawNodes() {
         ctx.fillStyle = "black";
         ctx.textBaseline = "middle";
         ctx.textAlign = "center";
-        ctx.font = "20px sans-serif";
+        ctx.font = "bold 20px sans-serif";
         ctx.fillText(nodes[i].name, nodes[i].x, nodes[i].y);
     }   
 }
 
+function drawEdge(x1, y1, x2, y2) {
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.setLineDash(DOTTED_LINE);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = MINT;
+    ctx.stroke();
+}
 function drawEdges() {
     let edges = Object.values(edgeSet);
     for (let i=0; i<edges.length; i++) {
@@ -196,18 +215,20 @@ function drawEdges() {
         ctx.beginPath();
         ctx.moveTo(node1.x, node1.y);
         ctx.lineTo(node2.x, node2.y);
+        ctx.setLineDash(STRAIGHT_LINE);   
         ctx.lineWidth = 2;
         ctx.strokeStyle = "white";
         ctx.stroke();
 
         ctx.fillStyle = "white";
         ctx.textBaseline = "ideographic";
-        ctx.textAlign = "end";
+        ctx.textAlign = "center";
         ctx.direction = "rtl"
         ctx.font = "12px sans-serif";
-        ctx.fillText(distance, midPoint.x, midPoint.y);
+        ctx.fillText(`d = ${distance}`, midPoint.x, midPoint.y);
     }
 }
+
 // ========================================================================================
 // Node Constructor
 // ========================================================================================
@@ -239,7 +260,8 @@ function Node(x, y, r) {
 // ========================================================================================
 function mouseMove(canvas, e) {
     let mousePosition = getMouseCoordinates(e);
-    
+    // console.log(currNode);
+
     // keep currNode from changing once we have it
     if (mouseOnNode(mousePosition.x, mousePosition.y)) {
         onNode = true;
@@ -247,11 +269,27 @@ function mouseMove(canvas, e) {
     }
     else {
         onNode = false;
+        count = 0;
         canvas.style.cursor = "default";
     }
-
+    console.log(drawingEdge);
     if (addingEdge) {
         canvas.style.cursor = "crosshair";
+        if (drawingEdge) {
+            resetCanvas();
+            drawEdge(currNode.x, currNode.y, mousePosition.x, mousePosition.y);
+            drawEdges();
+            drawNodes();
+        }
+        // if (drawingEdge) {
+        //     const tempSet = structuredClone(edgeSet);
+        //     let tempNode = new Node(mousePosition.x, mousePosition.y, 0);
+        //     tempNode.name = '@';
+        //     console.log(tempNode);
+        //     addToEdgeSet(currNode, tempNode);
+        //     drawCanvas();
+        //     edgeSet = tempSet;
+        // }
     }
 
     if (dragging) {
@@ -268,6 +306,7 @@ function mouseMove(canvas, e) {
 function mouseDown(e) {
     e.preventDefault();
     dragging = addingEdge? false : onNode;
+    drawingEdge = dragging? false :onNode;
     // Handle dragging
     if (dragging) {
         const mousePosition = getMouseCoordinates(e);
@@ -287,13 +326,14 @@ function mouseDown(e) {
 function mouseUp(e) {
     e.preventDefault();
     dragging = false;
-
+    drawingEdge = false;
     // Handle New Edge
     if (addingEdge) {
         const mousePosition = getMouseCoordinates(e);
         const neighbor = getNode(mousePosition.x, mousePosition.y);
 
         if (!currNode || !neighbor) {
+            drawCanvas();
             return;
         }
         else if (currNode != neighbor) {
