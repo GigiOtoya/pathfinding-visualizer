@@ -220,13 +220,33 @@ function drawEdges() {
         ctx.strokeStyle = "white";
         ctx.stroke();
 
-        ctx.fillStyle = "white";
-        ctx.textBaseline = "ideographic";
-        ctx.textAlign = "center";
-        ctx.direction = "rtl"
-        ctx.font = "12px sans-serif";
-        ctx.fillText(`d = ${distance}`, midPoint.x, midPoint.y);
+        annotateEdge(node1, node2);
     }
+}
+
+function annotateEdge(node1, node2) {
+    const midPoint = getMidpoint(node1, node2);
+    const distance = getDistance(node1, node2);
+    let dx = node2.x - node1.x;
+    let dy = node2.y - node1.y;
+
+    ctx.fillStyle = "white";
+    ctx.textBaseline = "bottom";
+    ctx.textAlign = "center";
+    ctx.font = "12px sans-serif";
+
+    ctx.save();
+    // get angle to where midpoint would be if translated.
+    let angle = Math.atan2(dy, dx);
+    // fix text orientation
+    if (angle < -Math.PI/2 || angle > Math.PI/2) {
+        angle -= Math.PI;
+    }
+
+    ctx.translate(midPoint.x, midPoint.y);
+    ctx.rotate(angle);
+    ctx.fillText(`d = ${distance}`, 0, 0);
+    ctx.restore();
 }
 
 // ========================================================================================
