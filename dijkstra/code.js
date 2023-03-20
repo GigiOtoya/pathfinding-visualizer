@@ -21,6 +21,7 @@ let edgeSet = {};
 const selectBtn = document.getElementById("select-btn");
 const nodeBtn = document.getElementById("add-node-btn");
 const edgeBtn = document.getElementById("add-edge-btn");
+const runBtn = document.getElementById("run-btn")
 
 // ========================================================================================
 // Event Listeners
@@ -28,6 +29,7 @@ const edgeBtn = document.getElementById("add-edge-btn");
 selectBtn.addEventListener("click", select);
 nodeBtn.addEventListener("click", addNode);
 edgeBtn.addEventListener("click", addEdge);
+runBtn.addEventListener("click", runAlgo);
 canvas.addEventListener("mousemove", (e) => {
     let mouseEvent = e;
     mouseMove(canvas, mouseEvent);
@@ -146,20 +148,6 @@ function addToEdgeSet(node1, node2) {
     }
 }
 
-function buildGraph() {
-    // let visited = [];
-    // let unvisited = [];
-
-    const g = new Graph();
-    for (let i=0; i<nodes.length; i++) {
-        g.insertNodeToGraph(nodes[i]);
-    }
-    edges = Object.values(edgeSet);
-    for (let i=0; i<edges.length; i++) {
-        g.addEdgeToGraph(edges[i].node1, edges[i].node2);
-    }
-    return g;
-}
 // ========================================================================================
 // Drawing Functions
 // ========================================================================================
@@ -419,6 +407,29 @@ function addNode(e) {
 function addEdge(e) {
     e.preventDefault();
     addingEdge = true;
+}
+
+function buildGraph() {
+    const g = new Graph();
+    for (let i=0; i<nodes.length; i++) {
+        g.insertNodeToGraph(nodes[i]);
+    }
+    edges = Object.values(edgeSet);
+    for (let i=0; i<edges.length; i++) {
+        g.addEdgeToGraph(edges[i].node1, edges[i].node2);
+    }
+    return g.adjacencyList;
+}
+
+function runAlgo(e) {
+    e.preventDefault();
+}
+
+function dijkstra() {
+    g = buildGraph();
+    const visited = [];
+    const unvisited = [...g.keys()];
+    return unvisited;
 }
 
 initialize();
