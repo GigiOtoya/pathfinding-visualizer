@@ -230,7 +230,7 @@ function annotateEdge(node1, node2) {
     let dx = node2.x - node1.x;
     let dy = node2.y - node1.y;
 
-    ctx.fillStyle = "white";
+    ctx.fillStyle = MINT;
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
     ctx.font = "12px sans-serif";
