@@ -429,7 +429,7 @@ function dijkstra() {
     g = buildGraph();
     const visited = [];
     const unvisited = [...g.keys()];
-    return unvisited;
+    
 }
 
 initialize();
