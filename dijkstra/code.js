@@ -21,7 +21,9 @@ let edgeSet = {};
 const selectBtn = document.getElementById("select-btn");
 const nodeBtn = document.getElementById("add-node-btn");
 const edgeBtn = document.getElementById("add-edge-btn");
-const runBtn = document.getElementById("run-btn")
+const runBtn = document.getElementById("run-btn");
+const sourceSelect = document.getElementById("source-select");
+const destinationSelect = document.getElementById("destination-select");
 
 // ========================================================================================
 // Event Listeners
@@ -301,6 +303,7 @@ function mouseMove(canvas, e) {
     }
 
     if (dragging) {
+        canvas.style.cursor = "grabbing";
         currNode.x = mousePosition.x;
         currNode.y = mousePosition.y;
         nodes.forEach(node => console.log(`x: ${node.x}, y: ${node.y}`));
@@ -400,10 +403,20 @@ function addNode(e) {
     addingEdge = false;
     let node = new Node(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 20);
     nodes.push(node);
+
+    addToDropDown(node.name, sourceSelect);
+    addToDropDown(node.name, destinationSelect);
     // graph.set(node, new Map());
     drawCanvas();
 };
 
+function addToDropDown(name, dropDown) {
+    const newOption = document.createElement("option");
+    const optionText = document.createTextNode(name);
+    newOption.setAttribute("value", name);
+    newOption.appendChild(optionText);
+    dropDown.appendChild(newOption);
+}
 function addEdge(e) {
     e.preventDefault();
     addingEdge = true;
@@ -420,16 +433,20 @@ function buildGraph() {
     }
     return g.adjacencyList;
 }
-
+ 
 function runAlgo(e) {
     e.preventDefault();
+    g = buildGraph();
+    dijkstra(g,)
 }
 
-function dijkstra() {
+function dijkstra(graph, source, destination) {
+    const index = source.name.charCodeAt() - 65;
     g = buildGraph();
     const visited = [];
     const unvisited = [...g.keys()];
-    
+    const distances = [];
+    distances[index] = 0;
 }
 
 initialize();
