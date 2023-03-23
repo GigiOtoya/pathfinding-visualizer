@@ -59,7 +59,11 @@ function initialize() {
     // addEdgeToGraph(n1,n2);
     // addEdgeToGraph(n1,n3);
     // addEdgeToGraph(n2,n3);
-
+    for (let i=0; i<nodes.length; i++) {
+        addToDropDown(nodes[i].name, sourceSelect);
+        addToDropDown(nodes[i].name, destinationSelect);
+    }
+    
     addToEdgeSet(n1,n2);
     addToEdgeSet(n1,n3);
     addToEdgeSet(n2,n3);
