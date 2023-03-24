@@ -447,10 +447,68 @@ function runAlgo(e) {
 function dijkstra(graph, source, destination) {
     const index = source.name.charCodeAt() - 65;
     g = buildGraph();
-    const visited = [];
-    const unvisited = [...g.keys()];
+
+    const visited = new Set();
+    const unvisited = new Set([...g.keys()]);
     const distances = [];
+
+    for (let i=0; i<g.size; i++) distances[i] = Infinity;
     distances[index] = 0;
+
+    let visiting = source;
+    while (unvisited.size) {
+        const visitingIndex = visiting.name.charCodeAt() - 65;
+        const neighbors = g.get(visiting);
+        // go through neighbors of current Node
+        for (let [neighbor, distance] of neighbors) {
+            const index = neighbor.name.charCodeAt() - 65;
+            const pathSum = distances[visitingIndex] + distance;
+
+            if (!visited.has(neighbor) && pathSum < distances[index]){
+                distances[index] = pathSum;
+            }
+        }
+        // update visited
+        visited.add(visiting);
+        // extract 
+        unvisited.delete(visiting);
+        // get next closest node
+        visiting = 1
+
+    }
+}
+
+function MinHeap() {
+    this.minHeap = [];
+
+    this.minHeapify = function(arr, index) {
+        let smallest = index;
+        let left = 2*index+1;
+        let right = 2*index+2;
+
+        if (left < arr.length && arr[left] < arr[smallest]) {
+            smallest = left;
+        }
+
+        if (right < arr.length && arr[right] < arr[smallest]) {
+            smallest = right;
+        }
+
+        if (smallest != index) {
+            let temp = arr[index];
+            arr[index] = arr[smallest];
+            arr[smallest] = temp;
+
+            this.minHeapify(arr, smallest);
+        }
+    }
+
+    this.buildHeap = function(arr) {
+        this.minHeap = arr;
+        for (let i = Math.floor(arr.length / 2); i >= 0; i--) {
+            this.minHeapify(this.minHeap, i);
+        }
+    }
 }
 
 initialize();
