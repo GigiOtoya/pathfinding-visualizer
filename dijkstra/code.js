@@ -509,6 +509,53 @@ function MinHeap() {
             this.minHeapify(this.minHeap, i);
         }
     }
+
+    this.heapPush = function(node) {
+        this.minHeap.push(node);
+        this.bubbleUp(this.minHeap.length - 1);
+    }
+    
+    this.bubbleUp = function(index) {
+        const parent = Math.floor((index-1) / 2);
+        if (index > 0 && this.minHeap[index] < this.minHeap[parent]) {
+            const temp = this.minHeap[parent];
+            this.minHeap[parent] = this.minHeap[index];
+            this.minHeap[index] = temp;
+            this.bubbleUp(parent);
+        }
+    }
+
+    this.heapPop = function() {
+        if (this.minHeap.length > 0) {
+            const min = this.minHeap[0];
+            this.minHeap[0] = this.minHeap[this.minHeap.length - 1];
+            this.minHeap.length -= 1;
+            this.bubbleDown(0);
+            return min;
+        }
+    }
+
+    this.bubbleDown = function(index) {
+        let smallest = index;
+        let left = 2*index+1;
+        let right = 2*index+2;
+
+        if (left < this.minHeap.length && this.minHeap[smallest] > this.minHeap[left]) {
+            smallest = left;
+        }
+
+        if (right < this.minHeap.length && this.minHeap[smallest] > this.minHeap[right]) {
+            smallest = right;
+        }
+
+        if (smallest != index) {
+            const temp = this.minHeap[index];
+            this.minHeap[index] = this.minHeap[smallest];
+            this.minHeap[smallest] = temp;
+
+            this.bubbleDown(smallest);
+        }
+    }
 }
 
 initialize();
