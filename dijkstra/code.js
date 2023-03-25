@@ -95,18 +95,6 @@ function Graph() {
 
 }
 
-// Graph functions
-// function insertNodeToGraph(node) {
-//     graph.set(node, new Map());
-// }
-
-// function addEdgeToGraph(node1, node2) {
-//     const distance = getDistance(node1, node2);
-//     // distance set for both nodes connected by edge
-//     graph.get(node1).set(node2, distance);
-//     graph.get(node2).set(node1, distance);
-// }
-
 // ========================================================================================
 // Miscellaneous
 // ========================================================================================
@@ -121,15 +109,6 @@ function getMidpoint(node1, node2) {
     const y = Math.round((node1.y + node2.y) / 2);
     return {x: x, y: y};
 }
-
-// function updateEdgeDistance(node) {
-//     // get map of nodes connected to node
-//     const neighbors = graph.get(node);
-//     // update distances
-//     for (let neighbor of neighbors.keys()) {
-//         addEdgeToGraph(node, neighbor);
-//     }
-// }
 
 function addToEdgeSet(node1, node2) {
     const nodeValue1 = node1.name.charCodeAt();
@@ -251,22 +230,6 @@ function Node(x, y, r) {
     this.y = y;
     this.r = r;    
     this.name = String.fromCharCode(65 + nodes.length);
-    
-    // this.drawNode = function() {
-    //     ctx.beginPath();
-    //     ctx.arc(this.x, this.y, this.r, 0, Math.PI *2);
-    //     ctx.fillStyle = "lightsteelBlue";
-    //     ctx.strokeStyle = "white";
-    //     ctx.lineWidth = 3;
-    //     ctx.fill();
-    //     ctx.stroke();
-
-    //     ctx.fillStyle = "black";
-    //     ctx.textBaseline = "middle";
-    //     ctx.textAlign = "center";
-    //     ctx.font = "20px sans-serif";
-    //     ctx.fillText(this.name, this.x, this.y);
-    // };
 };
 
 // ========================================================================================
@@ -295,15 +258,6 @@ function mouseMove(canvas, e) {
             drawEdges();
             drawNodes();
         }
-        // if (drawingEdge) {
-        //     const tempSet = structuredClone(edgeSet);
-        //     let tempNode = new Node(mousePosition.x, mousePosition.y, 0);
-        //     tempNode.name = '@';
-        //     console.log(tempNode);
-        //     addToEdgeSet(currNode, tempNode);
-        //     drawCanvas();
-        //     edgeSet = tempSet;
-        // }
     }
 
     if (dragging) {
@@ -441,83 +395,70 @@ function buildGraph() {
 function runAlgo(e) {
     e.preventDefault();
     g = buildGraph();
-    dijkstra(g,)
+    // const index = source.name.charCodeAt() - 65;
+    const source = sourceSelect.value;
+    const destination = destinationSelect.value;
+
+    dijkstra(g,
+        nodes[source.charCodeAt()-65],
+        nodes[destination.charCodeAt()-65]);
 }
 
 function dijkstra(graph, source, destination) {
-    const index = source.name.charCodeAt() - 65;
-    g = buildGraph();
-
     const visited = new Set();
-    const unvisited = new Set([...g.keys()]);
-    const distances = [];
+    const distances = new Map();
+    const heapQ = new MinHeap();
+    
 
-    for (let i=0; i<g.size; i++) distances[i] = Infinity;
-    distances[index] = 0;
+    for (let node of graph.keys()) {
+        distances.set(node, Infinity);
+    }
+    distances.set(source, 0);
+    heapQ.heapPush([0, source]);
+    
+    while (heapQ.minHeap.length) {
+        // get node with least total distance
+        const [curDist, curNode] = heapQ.heapPop();
+        if (!visited.has(curNode)) {
+            visited.add(curNode);
 
-    let visiting = source;
-    while (unvisited.size) {
-        const visitingIndex = visiting.name.charCodeAt() - 65;
-        const neighbors = g.get(visiting);
-        // go through neighbors of current Node
-        for (let [neighbor, distance] of neighbors) {
-            const index = neighbor.name.charCodeAt() - 65;
-            const pathSum = distances[visitingIndex] + distance;
-
-            if (!visited.has(neighbor) && pathSum < distances[index]){
-                distances[index] = pathSum;
+            for (let [neighbor, weight] of graph.get(curNode)) {
+                const nextDist = curDist + weight;
+                if (!visited.has(neighbor) && nextDist < distances.get(neighbor)) {
+                    distances.set(neighbor, nextDist);
+                    heapQ.heapPush([nextDist, neighbor]);
+                }
             }
         }
-        // update visited
-        visited.add(visiting);
-        // extract 
-        unvisited.delete(visiting);
-        // get next closest node
-        visiting = 1
+        // if (!distances.has(curNode)) {
+        //     distances.set(curNode, curDist);
+        //     const neighbors = graph.get(curNode)
 
+        //     for (let [neighbor, weight] of neighbors) {
+        //         if (!distances.has(neighbor)) {
+        //             heapQ.heapPush([curDist + weight, neighbor])
+        //         }
+        //     }
+        // }
     }
+    console.log(distances);
+}
+
+function pathTrace() {
+    
 }
 
 function MinHeap() {
     this.minHeap = [];
 
-    this.minHeapify = function(arr, index) {
-        let smallest = index;
-        let left = 2*index+1;
-        let right = 2*index+2;
-
-        if (left < arr.length && arr[left] < arr[smallest]) {
-            smallest = left;
-        }
-
-        if (right < arr.length && arr[right] < arr[smallest]) {
-            smallest = right;
-        }
-
-        if (smallest != index) {
-            let temp = arr[index];
-            arr[index] = arr[smallest];
-            arr[smallest] = temp;
-
-            this.minHeapify(arr, smallest);
-        }
-    }
-
-    this.buildHeap = function(arr) {
-        this.minHeap = arr;
-        for (let i = Math.floor(arr.length / 2); i >= 0; i--) {
-            this.minHeapify(this.minHeap, i);
-        }
-    }
-
-    this.heapPush = function(node) {
-        this.minHeap.push(node);
+    this.heapPush = function(item) {
+        this.minHeap.push(item);
         this.bubbleUp(this.minHeap.length - 1);
     }
     
     this.bubbleUp = function(index) {
         const parent = Math.floor((index-1) / 2);
-        if (index > 0 && this.minHeap[index] < this.minHeap[parent]) {
+        if (index > 0 && this.minHeap[index][0] < this.minHeap[parent][0]) {
             const temp = this.minHeap[parent];
             this.minHeap[parent] = this.minHeap[index];
             this.minHeap[index] = temp;
@@ -540,11 +481,11 @@ function MinHeap() {
         let left = 2*index+1;
         let right = 2*index+2;
 
-        if (left < this.minHeap.length && this.minHeap[smallest] > this.minHeap[left]) {
+        if (left < this.minHeap.length && this.minHeap[smallest][0] > this.minHeap[left][0]) {
             smallest = left;
         }
 
-        if (right < this.minHeap.length && this.minHeap[smallest] > this.minHeap[right]) {
+        if (right < this.minHeap.length && this.minHeap[smallest][0] > this.minHeap[right][0]) {
             smallest = right;
         }
 
@@ -554,6 +495,35 @@ function MinHeap() {
             this.minHeap[smallest] = temp;
 
             this.bubbleDown(smallest);
+        }
+    }
+
+    this.minHeapify = function(arr, index) {
+        let smallest = index;
+        let left = 2*index+1;
+        let right = 2*index+2;
+
+        if (left < arr.length && arr[left][0] < arr[smallest][0]) {
+            smallest = left;
+        }
+
+        if (right < arr.length && arr[right][0] < arr[smallest][0]) {
+            smallest = right;
+        }
+
+        if (smallest != index) {
+            let temp = arr[index];
+            arr[index] = arr[smallest];
+            arr[smallest] = temp;
+
+            this.minHeapify(arr, smallest);
+        }
+    }
+
+    this.buildHeap = function(arr) {
+        this.minHeap = arr;
+        for (let i = Math.floor(arr.length / 2); i >= 0; i--) {
+            this.minHeapify(this.minHeap, i);
         }
     }
 }
