@@ -8,6 +8,7 @@ const DOTTED_LINE = [10,10];
 const STRAIGHT_LINE = [];
 const DARK_PASTEL = "#1b1b1b"
 const INDIGO = "#336DFF";
+const WHITE = "#FFFFFF";
 const MINT = "#3BB3A0";
 
 let onNode = false;
@@ -150,12 +151,12 @@ function drawNodes() {
     }   
 }
 
-function drawNode(node, color) {
+function drawNode(node, fillColor, strokeColor) {
     ctx.beginPath();
     ctx.setLineDash(STRAIGHT_LINE);
     ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.strokeStyle = "white";
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = strokeColor;
     ctx.lineWidth = 3;
     ctx.fill();
     ctx.stroke();
@@ -167,13 +168,13 @@ function drawNode(node, color) {
     ctx.fillText(node.name, node.x, node.y);
 }
 
-function drawEdge(x1, y1, x2, y2) {
+function drawEdge(x1, y1, x2, y2, lineColor, lineStyle = STRAIGHT_LINE) {
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
-    ctx.setLineDash(DOTTED_LINE);
+    ctx.setLineDash(lineStyle);
     ctx.lineWidth = 2;
-    ctx.strokeStyle = MINT;
+    ctx.strokeStyle = lineColor;
     ctx.stroke();
 }
 function drawEdges() {
@@ -181,17 +182,7 @@ function drawEdges() {
     for (let i=0; i<edges.length; i++) {
         const node1 = edges[i].node1;
         const node2 = edges[i].node2;
-        const midPoint = getMidpoint(node1, node2);
-        const distance = getDistance(node1, node2);
-
-        ctx.beginPath();
-        ctx.moveTo(node1.x, node1.y);
-        ctx.lineTo(node2.x, node2.y);
-        ctx.setLineDash(STRAIGHT_LINE);   
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = "white";
-        ctx.stroke();
-
+        drawEdge(node1.x, node1.y, node2.x, node2.y, WHITE);
         annotateEdge(node1, node2);
     }
 }
@@ -253,7 +244,7 @@ function mouseMove(canvas, e) {
         canvas.style.cursor = "crosshair";
         if (drawingEdge) {
             resetCanvas();
-            drawEdge(currNode.x, currNode.y, mousePosition.x, mousePosition.y);
+            drawEdge(currNode.x, currNode.y, mousePosition.x, mousePosition.y, MINT, DOTTED_LINE);
             drawEdges();
             drawNodes();
         }
@@ -446,10 +437,14 @@ function dijkstra(graph, source, destination) {
     pathTrace(paths, source, destination);
 }
 
-function pathTrace(paths, source, destination) {
-    while (destination) {
-        drawNode(destination, INDIGO)
-        destination = paths.get(destination);
+function pathTrace(paths, start, end) {
+    while (end) {
+        let previous = paths.get(end);
+        if (previous) {
+            drawEdge(end.x, end.y, previous.x, previous.y, "green");
+        }
+        drawNode(end, INDIGO, "green");
+        end = previous;
     }
 }
 
