@@ -407,6 +407,7 @@ function runAlgo(e) {
 function dijkstra(graph, source, destination) {
     const visited = new Set();
     const distances = new Map();
+    const previous = new Map();
     const heapQ = new MinHeap();
     
 
@@ -414,6 +415,7 @@ function dijkstra(graph, source, destination) {
         distances.set(node, Infinity);
     }
     distances.set(source, 0);
+    previous.set(source, null);
     heapQ.heapPush([0, source]);
     
     while (heapQ.minHeap.length) {
@@ -426,6 +428,7 @@ function dijkstra(graph, source, destination) {
                 const nextDist = curDist + weight;
                 if (!visited.has(neighbor) && nextDist < distances.get(neighbor)) {
                     distances.set(neighbor, nextDist);
+                    previous.set(neighbor, curNode);
                     heapQ.heapPush([nextDist, neighbor]);
                 }
             }
@@ -442,6 +445,7 @@ function dijkstra(graph, source, destination) {
         // }
     }
     console.log(distances);
+    console.log(previous);
 }
 
 function pathTrace() {
