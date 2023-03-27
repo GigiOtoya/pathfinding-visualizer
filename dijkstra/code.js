@@ -7,6 +7,7 @@ const CANVAS_HEIGHT = 720;
 const DOTTED_LINE = [10,10];
 const STRAIGHT_LINE = [];
 const DARK_PASTEL = "#1b1b1b"
+const INDIGO = "#336DFF";
 const MINT = "#3BB3A0";
 
 let onNode = false;
@@ -53,12 +54,6 @@ function initialize() {
     let n3 = new Node(CANVAS_WIDTH / 2 + 100, CANVAS_HEIGHT / 2, r);
     nodes.push(n3);
 
-    // insertNodeToGraph(n1);
-    // insertNodeToGraph(n2);
-    // insertNodeToGraph(n3);
-    // addEdgeToGraph(n1,n2);
-    // addEdgeToGraph(n1,n3);
-    // addEdgeToGraph(n2,n3);
     for (let i=0; i<nodes.length; i++) {
         addToDropDown(nodes[i].name, sourceSelect);
         addToDropDown(nodes[i].name, destinationSelect);
@@ -151,21 +146,25 @@ function resetCanvas(){
 
 function drawNodes() {
     for (let i=0; i<nodes.length; i++) {
-        ctx.beginPath();
-        ctx.setLineDash(STRAIGHT_LINE);   
-        ctx.arc(nodes[i].x, nodes[i].y, nodes[i].r, 0, Math.PI * 2);
-        ctx.fillStyle = MINT;
-        ctx.strokeStyle = "white";
-        ctx.lineWidth = 3;
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = "black";
-        ctx.textBaseline = "middle";
-        ctx.textAlign = "center";
-        ctx.font = "bold 20px sans-serif";
-        ctx.fillText(nodes[i].name, nodes[i].x, nodes[i].y);
+        drawNode(nodes[i], MINT);
     }   
+}
+
+function drawNode(node, color) {
+    ctx.beginPath();
+    ctx.setLineDash(STRAIGHT_LINE);
+    ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 3;
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = "black";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    ctx.font = "bold 20px sans-serif";
+    ctx.fillText(node.name, node.x, node.y);
 }
 
 function drawEdge(x1, y1, x2, y2) {
@@ -398,7 +397,7 @@ function runAlgo(e) {
     // const index = source.name.charCodeAt() - 65;
     const source = sourceSelect.value;
     const destination = destinationSelect.value;
-
+    drawCanvas();
     dijkstra(g,
         nodes[source.charCodeAt()-65],
         nodes[destination.charCodeAt()-65]);
@@ -407,7 +406,7 @@ function runAlgo(e) {
 function dijkstra(graph, source, destination) {
     const visited = new Set();
     const distances = new Map();
-    const previous = new Map();
+    const paths = new Map();
     const heapQ = new MinHeap();
     
 
@@ -415,7 +414,7 @@ function dijkstra(graph, source, destination) {
         distances.set(node, Infinity);
     }
     distances.set(source, 0);
-    previous.set(source, null);
+    paths.set(source, null);
     heapQ.heapPush([0, source]);
     
     while (heapQ.minHeap.length) {
@@ -428,7 +427,7 @@ function dijkstra(graph, source, destination) {
                 const nextDist = curDist + weight;
                 if (!visited.has(neighbor) && nextDist < distances.get(neighbor)) {
                     distances.set(neighbor, nextDist);
-                    previous.set(neighbor, curNode);
+                    paths.set(neighbor, curNode);
                     heapQ.heapPush([nextDist, neighbor]);
                 }
             }
@@ -444,12 +443,14 @@ function dijkstra(graph, source, destination) {
         //     }
         // }
     }
-    console.log(distances);
-    console.log(previous);
+    pathTrace(paths, source, destination);
 }
 
-function pathTrace() {
-    
+function pathTrace(paths, source, destination) {
+    while (destination) {
+        drawNode(destination, INDIGO)
+        destination = paths.get(destination);
+    }
 }
 
 function MinHeap() {
