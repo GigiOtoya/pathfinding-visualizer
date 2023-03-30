@@ -6,7 +6,8 @@ const CANVAS_WIDTH = 1280;
 const CANVAS_HEIGHT = 720;
 const DOTTED_LINE = [10,10];
 const STRAIGHT_LINE = [];
-const DARK_PASTEL = "#1b1b1b"
+const DARK_PASTEL = "#1b1b1b";
+const CYAN = "#00FEFE";
 const INDIGO = "#336DFF";
 const WHITE = "#FFFFFF";
 const MINT = "#3BB3A0";
@@ -147,7 +148,7 @@ function resetCanvas(){
 
 function drawNodes() {
     for (let i=0; i<nodes.length; i++) {
-        drawNode(nodes[i], MINT);
+        drawNode(nodes[i], MINT, WHITE);
     }   
 }
 
@@ -168,21 +169,22 @@ function drawNode(node, fillColor, strokeColor) {
     ctx.fillText(node.name, node.x, node.y);
 }
 
-function drawEdge(x1, y1, x2, y2, lineColor, lineStyle = STRAIGHT_LINE) {
+function drawEdge(p1, p2, lc=WHITE, lw=2, ls = STRAIGHT_LINE) {
     ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.setLineDash(lineStyle);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = lineColor;
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.setLineDash(ls);
+    ctx.lineWidth = lw;
+    ctx.strokeStyle = lc;
     ctx.stroke();
 }
+
 function drawEdges() {
     let edges = Object.values(edgeSet);
     for (let i=0; i<edges.length; i++) {
         const node1 = edges[i].node1;
         const node2 = edges[i].node2;
-        drawEdge(node1.x, node1.y, node2.x, node2.y, WHITE);
+        drawEdge(node1, node2);
         annotateEdge(node1, node2);
     }
 }
@@ -244,7 +246,7 @@ function mouseMove(canvas, e) {
         canvas.style.cursor = "crosshair";
         if (drawingEdge) {
             resetCanvas();
-            drawEdge(currNode.x, currNode.y, mousePosition.x, mousePosition.y, MINT, DOTTED_LINE);
+            drawEdge(currNode, mousePosition, MINT, 2, DOTTED_LINE);
             drawEdges();
             drawNodes();
         }
@@ -399,6 +401,7 @@ function dijkstra(graph, source, destination) {
     const distances = new Map();
     const paths = new Map();
     const heapQ = new MinHeap();
+    const drawCommands = []
     
 
     for (let node of graph.keys()) {
@@ -408,45 +411,63 @@ function dijkstra(graph, source, destination) {
     paths.set(source, null);
     heapQ.heapPush([0, source]);
     
-    while (heapQ.minHeap.length) {
-        // get node with least total distance
-        const [curDist, curNode] = heapQ.heapPop();
-        if (!visited.has(curNode)) {
-            visited.add(curNode);
+    (async () => {
+        while (heapQ.minHeap.length) {
+            // get node with least total distance
+            const [curDist, curNode] = heapQ.heapPop();
+            if (!visited.has(curNode)) {
+                visited.add(curNode);
+                // drawCommands.push(function() { drawNode(curNode, INDIGO, "red")})
 
-            for (let [neighbor, weight] of graph.get(curNode)) {
-                const nextDist = curDist + weight;
-                if (!visited.has(neighbor) && nextDist < distances.get(neighbor)) {
-                    distances.set(neighbor, nextDist);
-                    paths.set(neighbor, curNode);
-                    heapQ.heapPush([nextDist, neighbor]);
+                drawNode(curNode, INDIGO, CYAN)
+                console.log(visited);
+                await delay(200);
+
+                for (let [neighbor, weight] of graph.get(curNode)) {
+                    const nextDist = curDist + weight;
+                    if (!visited.has(neighbor) && nextDist < distances.get(neighbor)) {
+                        distances.set(neighbor, nextDist);
+                        paths.set(neighbor, curNode);
+                        heapQ.heapPush([nextDist, neighbor]);
+                        // drawCommands.push(function() {drawEdge(curNode, neighbor, "red", 3)})
+                        drawEdge(curNode, neighbor, CYAN, 4);
+                        drawNode(curNode, INDIGO, CYAN);
+                        drawNode(neighbor, MINT, "white");
+                        await delay(200);
+                    }
                 }
             }
         }
-        // if (!distances.has(curNode)) {
-        //     distances.set(curNode, curDist);
-        //     const neighbors = graph.get(curNode)
-
-        //     for (let [neighbor, weight] of neighbors) {
-        //         if (!distances.has(neighbor)) {
-        //             heapQ.heapPush([curDist + weight, neighbor])
-        //         }
-        //     }
-        // }
-    }
-    pathTrace(paths, source, destination);
+        pathTrace(paths, source, destination);
+    })();
+    // pathTrace(paths, source, destination);
+    // animate(drawCommands);
 }
+
+const delay = (ms) => new Promise(function(resolve) {
+    setTimeout(() => {resolve()}, ms);
+});
 
 function pathTrace(paths, start, end) {
     while (end) {
         let previous = paths.get(end);
         if (previous) {
-            drawEdge(end.x, end.y, previous.x, previous.y, "green");
+            drawEdge(end, previous, "#00FF00", 4);
         }
-        drawNode(end, INDIGO, "green");
+        drawNode(end, INDIGO, "#00FF00");
         end = previous;
     }
 }
+// function animate(drawCommands) {
+//     (function loop(i) {
+//         setTimeout(function() {
+
+//             if (i < drawCommands.length) drawCommands[i]();
+
+//             if (i++ < drawCommands.length) loop(i);
+//         }, 1000);
+//     })(0);
+// }
 
 function MinHeap() {
     this.minHeap = [];
