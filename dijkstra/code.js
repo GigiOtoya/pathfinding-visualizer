@@ -3,7 +3,7 @@ const boundingRect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext("2d");
 
 const CANVAS_WIDTH = 1280;
-const CANVAS_HEIGHT = 720;
+const CANVAS_HEIGHT = window.innerHeight;
 const DOTTED_LINE = [10,10];
 const STRAIGHT_LINE = [];
 const DARK_PASTEL = "#1b1b1b";
@@ -230,6 +230,9 @@ function Node(x, y, r) {
 function mouseMove(canvas, e) {
     let mousePosition = getMouseCoordinates(e);
     // console.log(currNode);
+    console.log(`x: ${e.clientX}, y: ${e.clientY}`);
+    console.log(mousePosition);
+    console.log(boundingRect);
 
     // keep currNode from changing once we have it
     if (mouseOnNode(mousePosition.x, mousePosition.y)) {
@@ -430,7 +433,7 @@ function dijkstra(graph, source, destination) {
                         paths.set(neighbor, curNode);
                         heapQ.heapPush([nextDist, neighbor]);
                         // drawCommands.push(function() {drawEdge(curNode, neighbor, "red", 3)})
-                        drawEdge(curNode, neighbor, CYAN, 4);
+                        drawEdge(curNode, neighbor, INDIGO, 4);
                         drawNode(curNode, INDIGO, CYAN);
                         drawNode(neighbor, MINT, "white");
                         await delay(200);
