@@ -11,6 +11,8 @@ const CYAN = "#00FEFE";
 const INDIGO = "#336DFF";
 const WHITE = "#FFFFFF";
 const MINT = "#3BB3A0";
+const GREY = "#3c4043";
+const GREEN = "#00FF00";
 
 let onNode = false;
 let dragging = false;
@@ -148,21 +150,21 @@ function resetCanvas(){
 
 function drawNodes() {
     for (let i=0; i<nodes.length; i++) {
-        drawNode(nodes[i], MINT, WHITE);
+        drawNode(nodes[i]);
     }   
 }
 
-function drawNode(node, fillColor, strokeColor) {
+function drawNode(node, fc = GREY, sc = WHITE, lw = 3) {
     ctx.beginPath();
     ctx.setLineDash(STRAIGHT_LINE);
     ctx.arc(node.x, node.y, node.r, 0, Math.PI * 2);
-    ctx.fillStyle = fillColor;
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = 3;
+    ctx.fillStyle = fc;
+    ctx.strokeStyle = sc;
+    ctx.lineWidth = lw;
     ctx.fill();
     ctx.stroke();
 
-    ctx.fillStyle = "black";
+    ctx.fillStyle = "white";
     ctx.textBaseline = "middle";
     ctx.textAlign = "center";
     ctx.font = "bold 20px sans-serif";
@@ -420,11 +422,10 @@ function dijkstra(graph, source, destination) {
             const [curDist, curNode] = heapQ.heapPop();
             if (!visited.has(curNode)) {
                 visited.add(curNode);
-                // drawCommands.push(function() { drawNode(curNode, INDIGO, "red")})
 
-                drawNode(curNode, INDIGO, CYAN)
+                drawNode(curNode, GREY, INDIGO, 4);
                 console.log(visited);
-                await delay(200);
+                await delay(500);
 
                 for (let [neighbor, weight] of graph.get(curNode)) {
                     const nextDist = curDist + weight;
@@ -432,11 +433,10 @@ function dijkstra(graph, source, destination) {
                         distances.set(neighbor, nextDist);
                         paths.set(neighbor, curNode);
                         heapQ.heapPush([nextDist, neighbor]);
-                        // drawCommands.push(function() {drawEdge(curNode, neighbor, "red", 3)})
                         drawEdge(curNode, neighbor, INDIGO, 4);
-                        drawNode(curNode, INDIGO, CYAN);
-                        drawNode(neighbor, MINT, "white");
-                        await delay(200);
+                        drawNode(curNode, GREY, INDIGO, 4);
+                        drawNode(neighbor);
+                        await delay(500);
                     }
                 }
             }
@@ -455,22 +455,12 @@ function pathTrace(paths, start, end) {
     while (end) {
         let previous = paths.get(end);
         if (previous) {
-            drawEdge(end, previous, "#00FF00", 4);
+            drawEdge(end, previous, GREEN, 4);
         }
-        drawNode(end, INDIGO, "#00FF00");
+        drawNode(end, GREY, GREEN, 4);
         end = previous;
     }
 }
-// function animate(drawCommands) {
-//     (function loop(i) {
-//         setTimeout(function() {
-
-//             if (i < drawCommands.length) drawCommands[i]();
-
-//             if (i++ < drawCommands.length) loop(i);
-//         }, 1000);
-//     })(0);
-// }
 
 function MinHeap() {
     this.minHeap = [];
