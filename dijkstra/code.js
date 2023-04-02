@@ -1,9 +1,9 @@
-const canvas = document.getElementById("canvas");
+const canvas = document.getElementById("graph-canvas");
 const boundingRect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext("2d");
 
-const CANVAS_WIDTH = 1280;
-const CANVAS_HEIGHT = window.innerHeight;
+const CANVAS_WIDTH = window.innerWidth - 300;
+const CANVAS_HEIGHT = window.innerHeight - 60;
 const DOTTED_LINE = [10,10];
 const STRAIGHT_LINE = [];
 const DARK_PASTEL = "#1b1b1b";
@@ -50,6 +50,7 @@ function initialize() {
     canvas.width = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
 
+    console.log(CANVAS_WIDTH)
     const r = 20;
     let n1 = new Node(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100, r);
     nodes.push(n1);

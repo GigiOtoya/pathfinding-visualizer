@@ -23,13 +23,18 @@
             <img src="images/logo.svg"/ alt="Graph Logo">
             <h1> Pathfinding Visualizer </h1>
         </nav>
-        <div class="canvas-wrapper">
+        <div id = "main-wrapper" class="canvas-wrapper">
             <div class="control-panel">
                 <h1> Control Panel </h1>
-                <button id="select-btn"> Select </button>
-                <button id="add-node-btn"> Add Node </button>
-                <button id="add-edge-btn"> Add Edge </button>
-                <button id="run-btn"> Run </button>
+                <button id="select-btn" class="button"> Select </button>
+                <button id="add-node-btn" class="button"> Add Node </button>
+                <button id="add-edge-btn" class="button"> Add Edge </button>
+                <button id="run-btn" class="button"> Run </button>
+                <svg >
+                    <path
+                        d="m 120.47058,32.555631 -37.277809,21.52235 c -1.265483,0.730626 -2.291359,0.138336 -2.291359,-1.322917 l 0,-43.044701 c 0,-1.4612534 1.025877,-2.0535433 2.291359,-1.3229166 L 120.47058,29.909797 c 1.26548,0.730627 1.26548,1.915207 0,2.645834 z"
+                        />
+                </svg>
                 <div class="node-selection">
                     <label for="source-select"> Start: </label>
                     <select name="source" id="source-select">
@@ -40,7 +45,7 @@
                     </select>
                 </div>
             </div>
-            <canvas id="canvas">
+            <canvas id="graph-canvas" class="canvas">
             </canvas>
         </div>
         <script src="dijkstra/code.js" async defer></script>
