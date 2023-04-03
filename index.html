@@ -20,29 +20,45 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
         <nav class="header">
-            <img src="images/logo.svg"/ alt="Graph Logo">
+            <img src="images/logo.svg" alt="Graph Logo"/>
             <h1> Pathfinding Visualizer </h1>
         </nav>
         <div id = "main-wrapper" class="canvas-wrapper">
             <div class="control-panel">
                 <h1> Control Panel </h1>
                 <button id="select-btn" class="button"> Select </button>
-                <button id="add-node-btn" class="button"> Add Node </button>
-                <button id="add-edge-btn" class="button"> Add Edge </button>
-                <button id="run-btn" class="button"> Run </button>
-                <svg >
-                    <path
-                        d="m 120.47058,32.555631 -37.277809,21.52235 c -1.265483,0.730626 -2.291359,0.138336 -2.291359,-1.322917 l 0,-43.044701 c 0,-1.4612534 1.025877,-2.0535433 2.291359,-1.3229166 L 120.47058,29.909797 c 1.26548,0.730627 1.26548,1.915207 0,2.645834 z"
-                        />
-                </svg>
+                <div id="node-buttons" class="adjacent-buttons">
+                    <button id="add-node-btn" class="button"> 
+                        <img src="images/plus-sign-icon.svg" alt="Play Button" class="icon"/>
+                        Node 
+                    </button>
+                    <button id="add-edge-btn" class="button">
+                        <img src="images/plus-sign-icon.svg" alt="Play Button" class="icon"/>
+                        Edge
+                    </button>
+                </div>
+                <button id="run-btn" class="button"> 
+                    <img src="images/playbutton.svg" alt="Play Button" class="icon"/>
+                    Play 
+                </button>
+                
                 <div class="node-selection">
                     <label for="source-select"> Start: </label>
                     <select name="source" id="source-select">
                     </select>
                     <label for="destination-select"> End: </label>
                     <select name="destination" id="destination-select">
-    
                     </select>
+                </div>
+                <div class="items">
+                    <ul>
+                        <li>Dijkstra Shortest Path</li>
+                        <li>Floyd-Warshall (All-Pairs)</li>
+                        <li>A* Search</li>
+                        <li>Depth First Searh</li>
+                        <li>Breadth First Search</li>
+                        <li>Best First Search</li>
+                    </ul>
                 </div>
             </div>
             <canvas id="graph-canvas" class="canvas">

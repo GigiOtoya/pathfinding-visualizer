@@ -201,7 +201,7 @@ function annotateEdge(node1, node2) {
     ctx.fillStyle = MINT;
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
-    ctx.font = "12px sans-serif";
+    ctx.font = "14px sans-serif";
 
     ctx.save();
     // get angle to where midpoint would be if translated.
