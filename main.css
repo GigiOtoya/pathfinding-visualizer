@@ -40,8 +40,9 @@ body {
     width: 300px;
     min-width: 300px;
     box-sizing: border-box;
-    border-right: solid;
-    border-color: black;
+    border-right: 1px solid;
+    border-color: grey;
+    color: white;
 }
 
 .control-panel h1 {
@@ -49,7 +50,6 @@ body {
     white-space: nowrap;
     font-weight:  400;
     font-size: 26px;
-    color: white;
     text-align: center;
 }
 
@@ -86,13 +86,39 @@ body {
 .node-selection {
     height: 50px;
     line-height: 50px;
+    background-color:#1f1f1f;
+}
+
+.node-selection select {
+    padding: 5px;
+    font-size: 16px;
+    border: none;
+    background-color:#1f1f1f;
+    scroll-behavior: smooth;
+    color: white;
+
+}
+
+.node-selection select:focus {
+    outline: none !important;
+}
+#start {
+    float: left;
+    width: 50%;
+    text-align: center;
+}
+
+#end {
+    float: right;
+    width: 50%;
+    text-align: center;
 }
 
 .items {
     box-sizing: border-box;
-    border-top: solid;
-    border-bottom: solid;
-    border-color: black;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    border-color: grey;
 }
 
 .items ul {
@@ -107,7 +133,8 @@ body {
     height: 50px;
     line-height: 50px;
 }
+
 .items li:hover {
-    background-color: #222222;
+    background-color: #336DFF;
     cursor: pointer;
 }
