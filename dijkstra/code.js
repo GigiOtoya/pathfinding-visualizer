@@ -393,19 +393,44 @@ function buildGraph() {
 function runAlgo(e) {
     e.preventDefault();
     g = buildGraph();
-    // const index = source.name.charCodeAt() - 65;
-    const source = sourceSelect.value;
-    const destination = destinationSelect.value;
+
+    
+    const source = nodes[sourceSelect.value.charCodeAt()-65];
+    const destination = nodes[destinationSelect.value.charCodeAt()-65];
     drawCanvas();
-    dijkstra(g,
-        nodes[source.charCodeAt()-65],
-        nodes[destination.charCodeAt()-65]);
+
+    switch(f) {
+        case 0 : dijkstra(g, source, destination);
+        break;
+        case 1 : floydWarshall();
+        break;
+        case 2 : aStarSearch();
+        break;
+        case 3 : depthFirstSearch(g, source, destination);
+        break;
+        case 4 : breadthFirstSearch();
+        break;
+        case 5 : bestFirstSearch();
+        break;
+    }
 }
 
 function sliderValue() {
     const factor = document.getElementById("speedcontrol").value;
     const speed = (2000 - factor * 500);
     return speed==0? 100 : speed;
+}
+
+let f = 0;
+const navItems = document.getElementById("nav-items").getElementsByTagName("li");
+for(item of navItems) {
+    item.addEventListener("click", function() {
+        for (item of navItems) {
+            item.classList = "";
+        }
+        this.classList.add("active");
+        f = this.value;
+    });
 }
 // ========================================================================================
 // Algorithms
@@ -551,12 +576,23 @@ function MinHeap() {
     }
 }
 
-function DepthFirstSearch(g, start, end) {
+function floydWarshall() {
+
+}
+
+function aStarSearch() {
+
+}
+
+function depthFirstSearch(g, start, end) {
     visited = new Set();
 
-    function dfs(node) {
+    async function dfs(node) {
         visited.add(node);
+        drawNode(node, GREY, INDIGO, 4);
         console.log(node);
+        await delay(sliderValue());
+        
         for (let neighbor of [...g.get(node).keys()]) {
             if (!visited.has(neighbor)) {
                 dfs(neighbor);
@@ -565,6 +601,14 @@ function DepthFirstSearch(g, start, end) {
         return;
     }
     dfs(start);
+}
+
+function breadthFirstSearch() {
+
+}
+
+function bestFirstSearch() {
+
 }
 
 initialize();
