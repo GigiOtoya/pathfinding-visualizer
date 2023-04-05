@@ -402,6 +402,9 @@ function runAlgo(e) {
         nodes[destination.charCodeAt()-65]);
 }
 
+// ========================================================================================
+// Algorithms
+// ========================================================================================
 function dijkstra(graph, source, destination) {
     const visited = new Set();
     const distances = new Map();
@@ -541,6 +544,22 @@ function MinHeap() {
             this.minHeapify(this.minHeap, i);
         }
     }
+}
+
+function DepthFirstSearch(g, start, end) {
+    visited = new Set();
+
+    function dfs(node) {
+        visited.add(node);
+        console.log(node);
+        for (let neighbor of [...g.get(node).keys()]) {
+            if (!visited.has(neighbor)) {
+                dfs(neighbor);
+            }
+        }
+        return;
+    }
+    dfs(start);
 }
 
 initialize();

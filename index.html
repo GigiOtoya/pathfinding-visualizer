@@ -37,11 +37,22 @@
                         Edge
                     </button>
                 </div>
-                <button id="run-btn" class="button"> 
-                    <img src="images/playbutton.svg" alt="Play Button" class="icon"/>
-                    Play 
-                </button>
-                
+                <div class="adjacent-buttons"> 
+                    <button id="run-btn" class="button"> 
+                        <img src="images/playbutton.svg" alt="Play Button" class="icon"/>
+                        Play 
+                    </button>
+                    <div class="button">
+                        <label for="speedControl"> Speed </label>
+                        <input
+                            type="range" 
+                            id="speedControl" 
+                            class="speed-control"
+                            name="speedControl" 
+                            min="1" 
+                            max="100">
+                    </div>
+                </div>
                 <div class="node-selection">
                     <div id="start" class="select">
                         <label for="source-select"> Start: </label>
@@ -54,6 +65,7 @@
                         </select>
                     </div>
                 </div>
+                
                 <div class="items">
                     <ul>
                         <li>Dijkstra Shortest Path</li>
