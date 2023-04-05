@@ -52,19 +52,14 @@ body {
     text-align: center;
 }
 
-.adjacent-buttons {
+.adjacent {
     display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    max-width: 100%;
 }
 
-.button {
+.control-item {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
     height: 50px;
     font-size: 16px;
     border:none;
@@ -72,7 +67,19 @@ body {
     color: white;
 }
 
-.button:hover {
+.big {
+    width: 100%;
+}
+
+.small {
+    width: 50%;
+}
+
+.slider {
+    flex-direction: column;
+}
+
+.control-panel button:hover {
     background-color: #1b1b1b;
     cursor: pointer;
 }
@@ -80,14 +87,6 @@ body {
 .icon {
     height: 20px;
     padding: 5px;
-}
-
-.slide-container {
-    text-align: center;
-}
-
-.slide-container input {
-    width: 62%;
 }
 
 .node-selection {
@@ -109,6 +108,7 @@ body {
 .node-selection select:focus {
     outline: none !important;
 }
+
 #start {
     float: left;
     width: 50%;
