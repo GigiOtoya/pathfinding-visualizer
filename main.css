@@ -79,6 +79,17 @@ body {
     flex-direction: column;
 }
 
+.slider input{
+    color: white;
+    cursor: pointer;
+}
+
+.slider datalist {
+    display: flex;
+    justify-content: space-between;
+    writing-mode:sideways-lr;
+    width: 100%;
+}
 .control-panel button:hover {
     background-color: #1b1b1b;
     cursor: pointer;
@@ -102,7 +113,6 @@ body {
     background-color:#1f1f1f;
     scroll-behavior: smooth;
     color: white;
-
 }
 
 .node-selection select:focus {

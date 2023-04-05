@@ -402,6 +402,11 @@ function runAlgo(e) {
         nodes[destination.charCodeAt()-65]);
 }
 
+function sliderValue() {
+    const factor = document.getElementById("speedcontrol").value;
+    const speed = (2000 - factor * 500);
+    return speed==0? 100 : speed;
+}
 // ========================================================================================
 // Algorithms
 // ========================================================================================
@@ -429,7 +434,7 @@ function dijkstra(graph, source, destination) {
 
                 drawNode(curNode, GREY, INDIGO, 4);
                 console.log(visited);
-                await delay(500);
+                await delay(sliderValue());
 
                 for (let [neighbor, weight] of graph.get(curNode)) {
                     const nextDist = curDist + weight;
@@ -440,7 +445,7 @@ function dijkstra(graph, source, destination) {
                         drawEdge(curNode, neighbor, INDIGO, 4);
                         drawNode(curNode, GREY, INDIGO, 4);
                         drawNode(neighbor);
-                        await delay(500);
+                        await delay(sliderValue());
                     }
                 }
             }

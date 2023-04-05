@@ -51,16 +51,26 @@
                     </button>
                     
                     <div class="control-item small slider">
-                        <label for="speedcontrol"> Speed </label>
+                        <label for="speedcontrol">  </label>
                         <input
                             type="range" 
                             id="speedcontrol" 
                             class="speed-control"
                             name="speedcontrol" 
-                            min="1" 
-                            max="100">
-
+                            list="values"
+                            min="0"
+                            max="4"
+                            step="1"/>
+                        
+                        <datalist id="values">
+                            <option value="0" label="slow"></option>
+                            <option value="1" ></option>
+                            <option value="2" ></option>
+                            <option value="3" ></option>
+                            <option value="4" label="fast"></option>
+                        </datalist>
                     </div>
+
                 </div>
 
                 <div class="node-selection">
