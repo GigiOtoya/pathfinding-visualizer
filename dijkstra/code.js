@@ -134,7 +134,7 @@ function addToEdgeSet(node1, node2) {
 }
 
 function randomInt(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 const randomBtn = document.getElementById("random-btn");
@@ -145,7 +145,9 @@ function randomGraph(e) {
     
     edgeSet = {};
     nodes.length = 0;
-    const n = 10;
+    const n = 5;
+    sourceSelect.length = 0;
+    destinationSelect.length = 0;
     while (nodes.length < n) {
         const node = new Node(
             randomInt(20, CANVAS_WIDTH-20),
@@ -156,7 +158,7 @@ function randomGraph(e) {
         let overlapping = false;
 
         for (let j = 0; j < nodes.length; j++) {
-            if (getDistance(node, nodes[j]) < (node.r + nodes[j].r)*2) {
+            if (getDistance(node, nodes[j]) < (node.r + nodes[j].r)*4) {
                 overlapping = true;
                 break;
             }
@@ -168,14 +170,13 @@ function randomGraph(e) {
         }
     }
 
-    const maxEdges = n * (n-1) / 2;
-    while (Object.keys(edgeSet).length < 35) {
+    // max edges = n*(n-1)/2
+    while (Object.keys(edgeSet).length < (n*(n-1)/2)) {
         const node1 = nodes[randomInt(0, nodes.length-1)];
         const node2 = nodes[randomInt(0, nodes.length-1)];
         if (node1 != node2) {
             addToEdgeSet(node1, node2);
         }
-        console.log(Object.keys(edgeSet).length);
     }
     drawCanvas();
 }
