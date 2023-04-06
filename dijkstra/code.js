@@ -158,7 +158,7 @@ function randomGraph(e) {
         let overlapping = false;
 
         for (let j = 0; j < nodes.length; j++) {
-            if (getDistance(node, nodes[j]) < (node.r + nodes[j].r)*4) {
+            if (getDistance(node, nodes[j]) < (node.r + nodes[j].r)*3) {
                 overlapping = true;
                 break;
             }
@@ -457,7 +457,6 @@ function runAlgo(e) {
     const source = nodes[sourceSelect.value.charCodeAt()-65];
     const destination = nodes[destinationSelect.value.charCodeAt()-65];
     drawCanvas();
-
     switch(f) {
         case 0 : dijkstra(g, source, destination);
         break;
@@ -465,7 +464,7 @@ function runAlgo(e) {
         break;
         case 2 : aStarSearch();
         break;
-        case 3 : depthFirstSearch(g, source, destination);
+        case 3 : depthFirstSearchi(g, source, destination);
         break;
         case 4 : breadthFirstSearch();
         break;
@@ -632,19 +631,44 @@ function aStarSearch() {
 
 }
 
+function depthFirstSearchi(g, start, end) {
+    const stack = [start];
+    const visited = new Set([start]);
+
+    (async () => {
+        while (stack.length) {
+            console.log([...stack])
+            const node = stack.pop();
+            drawNode(node, GREY, INDIGO, 4);
+            await delay(sliderValue());
+
+            for (neighbor of [...g.get(node).keys()]) {
+                if (!visited.has(neighbor)) {
+                    stack.push(neighbor);
+                    visited.add(neighbor);
+                    drawEdge(node, neighbor, INDIGO, 4);
+                    drawNode(node, GREY, INDIGO, 4);
+                    drawNode(neighbor);
+                    await delay(sliderValue());
+                }
+            }
+        }
+    })();
+}
 function depthFirstSearch(g, start, end) {
     visited = new Set();
-
+    console.log("dfs:");
     async function dfs(node) {
         visited.add(node);
         drawNode(node, GREY, INDIGO, 4);
         console.log(node);
-        await delay(sliderValue());
-        
+
         for (let neighbor of [...g.get(node).keys()]) {
             if (!visited.has(neighbor)) {
+                await delay(sliderValue());
                 dfs(neighbor);
             }
+
         }
         return;
     }
