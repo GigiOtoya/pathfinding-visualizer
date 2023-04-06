@@ -71,6 +71,10 @@ body {
     width: 100%;
 }
 
+#random-btn {
+    background-color: black;
+}
+
 .small {
     width: 50%;
 }
@@ -93,6 +97,10 @@ body {
 .control-panel button:hover {
     background-color: #1b1b1b;
     cursor: pointer;
+}
+
+.control-panel button:active {
+    transform: scale(.99, .99);
 }
 
 .icon {

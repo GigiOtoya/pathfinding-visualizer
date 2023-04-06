@@ -133,6 +133,52 @@ function addToEdgeSet(node1, node2) {
     }
 }
 
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+const randomBtn = document.getElementById("random-btn");
+randomBtn.addEventListener("click", randomGraph);
+
+function randomGraph(e) {
+    e.preventDefault();
+    
+    edgeSet = {};
+    nodes.length = 0;
+    const n = 10;
+    while (nodes.length < n) {
+        const node = new Node(
+            randomInt(20, CANVAS_WIDTH-20),
+            randomInt(20, CANVAS_HEIGHT-20),
+            20
+        );
+            
+        let overlapping = false;
+
+        for (let j = 0; j < nodes.length; j++) {
+            if (getDistance(node, nodes[j]) < (node.r + nodes[j].r)*2) {
+                overlapping = true;
+                break;
+            }
+        }
+        if (!overlapping) {
+            nodes.push(node);
+            addToDropDown(node.name, sourceSelect);
+            addToDropDown(node.name, destinationSelect);
+        }
+    }
+
+    const maxEdges = n * (n-1) / 2;
+    while (Object.keys(edgeSet).length < 35) {
+        const node1 = nodes[randomInt(0, nodes.length-1)];
+        const node2 = nodes[randomInt(0, nodes.length-1)];
+        if (node1 != node2) {
+            addToEdgeSet(node1, node2);
+        }
+        console.log(Object.keys(edgeSet).length);
+    }
+    drawCanvas();
+}
 // ========================================================================================
 // Drawing Functions
 // ========================================================================================
@@ -389,7 +435,19 @@ function buildGraph() {
     }
     return g.adjacencyList;
 }
- 
+
+let f = 0;
+const navItems = document.getElementById("nav-items").getElementsByTagName("li");
+for(item of navItems) {
+    item.addEventListener("click", function() {
+        for (item of navItems) {
+            item.classList = "";
+        }
+        this.classList.add("active");
+        f = this.value;
+    });
+}
+
 function runAlgo(e) {
     e.preventDefault();
     g = buildGraph();
@@ -421,17 +479,6 @@ function sliderValue() {
     return speed==0? 100 : speed;
 }
 
-let f = 0;
-const navItems = document.getElementById("nav-items").getElementsByTagName("li");
-for(item of navItems) {
-    item.addEventListener("click", function() {
-        for (item of navItems) {
-            item.classList = "";
-        }
-        this.classList.add("active");
-        f = this.value;
-    });
-}
 // ========================================================================================
 // Algorithms
 // ========================================================================================
