@@ -2,13 +2,11 @@ const canvas = document.getElementById("graph-canvas");
 const boundingRect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext("2d");
 
-const CANVAS_WIDTH = window.innerWidth - 300;
-const CANVAS_HEIGHT = window.innerHeight - 60;
 const DOTTED_LINE = [10,10];
 const STRAIGHT_LINE = [];
 const DARK_PASTEL = "#1b1b1b";
 const CYAN = "#00FEFE";
-const INDIGO = "#336DFF";
+const AZURE = "#336DFF";
 const WHITE = "#FFFFFF";
 const MINT = "#3BB3A0";
 const GREY = "#3c4043";
@@ -33,6 +31,7 @@ const destinationSelect = document.getElementById("destination-select");
 // ========================================================================================
 // Event Listeners
 // ========================================================================================
+window.addEventListener("resize", setSize)
 selectBtn.addEventListener("click", select);
 nodeBtn.addEventListener("click", addNode);
 edgeBtn.addEventListener("click", addEdge);
@@ -47,16 +46,15 @@ canvas.addEventListener("mouseup", mouseUp);
 
 // Functions
 function initialize() {
-    canvas.width = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
+    setSize();
 
-    console.log(CANVAS_WIDTH)
+    console.log(canvas.width)
     const r = 20;
-    let n1 = new Node(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 100, r);
+    let n1 = new Node(canvas.width / 2, canvas.height / 2 - 100, r);
     nodes.push(n1);
-    let n2 = new Node(CANVAS_WIDTH / 2 - 100, CANVAS_HEIGHT / 2, r);
+    let n2 = new Node(canvas.width / 2 - 100, canvas.height / 2, r);
     nodes.push(n2);
-    let n3 = new Node(CANVAS_WIDTH / 2 + 100, CANVAS_HEIGHT / 2, r);
+    let n3 = new Node(canvas.width / 2 + 100, canvas.height / 2, r);
     nodes.push(n3);
 
     for (let i=0; i<nodes.length; i++) {
@@ -98,6 +96,15 @@ function Graph() {
 // ========================================================================================
 // Miscellaneous
 // ========================================================================================
+function setSize() {
+    // const div = document.getElementById("canvas-wrapper");
+    // canvas.width = div.clientWidth;
+    // canvas.height = div.clientHeight;
+    canvas.width = window.innerWidth - boundingRect.x;
+    canvas.height = window.innerHeight - boundingRect.y;
+    drawCanvas();
+}
+
 function getDistance(node1, node2) {
     const deltaX = node2.x - node1.x;
     const deltaY = node2.y - node1.y;
@@ -150,8 +157,8 @@ function randomGraph(e) {
     destinationSelect.length = 0;
     while (nodes.length < n) {
         const node = new Node(
-            randomInt(20, CANVAS_WIDTH-20),
-            randomInt(20, CANVAS_HEIGHT-20),
+            randomInt(20, canvas.width-20),
+            randomInt(20, canvas.height-20),
             20
         );
             
@@ -180,20 +187,22 @@ function randomGraph(e) {
     }
     drawCanvas();
 }
+
+
 // ========================================================================================
 // Drawing Functions
 // ========================================================================================
 function drawCanvas() {
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = DARK_PASTEL;
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawEdges();
     drawNodes();
 }
 function resetCanvas(){
-    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = DARK_PASTEL;
-    ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawNodes() {
@@ -404,7 +413,7 @@ function select(e) {
 function addNode(e) {
     e.preventDefault();
     addingEdge = false;
-    let node = new Node(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, 20);
+    let node = new Node(canvas.width / 2, canvas.height / 2, 20);
     nodes.push(node);
 
     addToDropDown(node.name, sourceSelect);
@@ -466,7 +475,7 @@ function runAlgo(e) {
         break;
         case 3 : depthFirstSearchi(g, source, destination);
         break;
-        case 4 : breadthFirstSearch();
+        case 4 : breadthFirstSearch(g, source, destination);
         break;
         case 5 : bestFirstSearch();
         break;
@@ -504,7 +513,7 @@ function dijkstra(graph, source, destination) {
             if (!visited.has(curNode)) {
                 visited.add(curNode);
 
-                drawNode(curNode, GREY, INDIGO, 4);
+                drawNode(curNode, GREY, AZURE, 4);
                 console.log(visited);
                 await delay(sliderValue());
 
@@ -514,8 +523,8 @@ function dijkstra(graph, source, destination) {
                         distances.set(neighbor, nextDist);
                         paths.set(neighbor, curNode);
                         heapQ.heapPush([nextDist, neighbor]);
-                        drawEdge(curNode, neighbor, INDIGO, 4);
-                        drawNode(curNode, GREY, INDIGO, 4);
+                        drawEdge(curNode, neighbor, AZURE, 4);
+                        drawNode(curNode, GREY, AZURE, 4);
                         drawNode(neighbor);
                         await delay(sliderValue());
                     }
@@ -634,49 +643,77 @@ function aStarSearch() {
 function depthFirstSearchi(g, start, end) {
     const stack = [start];
     const visited = new Set([start]);
+    const paths = new Map([[start, null]]);
 
     (async () => {
         while (stack.length) {
             console.log([...stack])
             const node = stack.pop();
-            drawNode(node, GREY, INDIGO, 4);
+            drawNode(node, GREY, AZURE, 4);
             await delay(sliderValue());
 
             for (neighbor of [...g.get(node).keys()]) {
                 if (!visited.has(neighbor)) {
                     stack.push(neighbor);
                     visited.add(neighbor);
-                    drawEdge(node, neighbor, INDIGO, 4);
-                    drawNode(node, GREY, INDIGO, 4);
+                    paths.set(neighbor, node);
+                    drawEdge(node, neighbor, AZURE, 4);
+                    drawNode(node, GREY, AZURE, 4);
                     drawNode(neighbor);
                     await delay(sliderValue());
                 }
             }
         }
+        pathTrace(paths, start, end);
     })();
 }
-function depthFirstSearch(g, start, end) {
-    visited = new Set();
-    console.log("dfs:");
-    async function dfs(node) {
-        visited.add(node);
-        drawNode(node, GREY, INDIGO, 4);
-        console.log(node);
 
-        for (let neighbor of [...g.get(node).keys()]) {
-            if (!visited.has(neighbor)) {
-                await delay(sliderValue());
-                dfs(neighbor);
+
+// function depthFirstSearch(g, start, end) {
+//     visited = new Set();
+//     console.log("dfs:");
+//     async function dfs(node) {
+//         visited.add(node);
+//         drawNode(node, GREY, AZURE, 4);
+//         console.log(node);
+
+//         for (let neighbor of [...g.get(node).keys()]) {
+//             if (!visited.has(neighbor)) {
+//                 await delay(sliderValue());
+//                 dfs(neighbor);
+//             }
+
+//         }
+//         return;
+//     }
+//     dfs(start);
+// }
+
+function breadthFirstSearch(g, start, end) {
+    const Q = [start];
+    const visited = new Set([start]);
+    const paths = new Map([[start, null]]);
+
+    (async () => {
+        while (Q.length) {
+            const node = Q.shift(0);
+            drawNode(node, GREY, AZURE, 4);
+            await delay(sliderValue());
+
+            for (neighbor of [...g.get(node).keys()]) {
+                if (!visited.has(neighbor)) {
+                    Q.push(neighbor);
+                    visited.add(neighbor);
+                    paths.set(neighbor, node);
+                    drawEdge(node, neighbor, AZURE, 4);
+                    drawNode(node, GREY, AZURE, 4);
+                    drawNode(neighbor);
+                    await delay(sliderValue());
+                }
             }
-
         }
-        return;
-    }
-    dfs(start);
-}
-
-function breadthFirstSearch() {
-
+        pathTrace(paths, start, end);
+    })();
 }
 
 function bestFirstSearch() {

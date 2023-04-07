@@ -23,7 +23,7 @@
             <img src="images/logo.svg" alt="Graph Logo"/>
             <h1> Pathfinding Visualizer </h1>
         </nav>
-        <div id = "main-wrapper" class="canvas-wrapper">
+        <div id = "main-wrapper" class="main-container">
             <div class="control-panel">
                 <h1> Control Panel </h1>
 
@@ -102,8 +102,10 @@
                     <li value="5">Best First Search</li>
                 </ul>
             </div>
-            <canvas id="graph-canvas" class="canvas">
-            </canvas>
+            <div id="canvas-wrapper" class="canvas-container">
+                <canvas id="graph-canvas" class="canvas">
+                </canvas>
+            </div>
         </div>
         <script src="dijkstra/code.js" async defer></script>
     </body>
