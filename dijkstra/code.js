@@ -51,24 +51,40 @@ canvas.addEventListener("mouseup", mouseUp);
 // Functions
 function initialize() {
     setSize();
-
-    console.log(canvas.width)
     const r = 20;
-    let n1 = new Node(canvas.width / 2, canvas.height / 2 - 100, r);
+    // A
+    let n1 = new Node(canvas.width / 2, canvas.height / 2, r);
     nodes.push(n1);
-    let n2 = new Node(canvas.width / 2 - 100, canvas.height / 2, r);
+    // B
+    let n2 = new Node(canvas.width / 2 - 200, canvas.height / 2 - 75, r);
     nodes.push(n2);
-    let n3 = new Node(canvas.width / 2 + 100, canvas.height / 2, r);
+    // C
+    let n3 = new Node(canvas.width / 2 + 30, canvas.height / 2 - 150, r);
     nodes.push(n3);
-
+    // D
+    let n4 = new Node(canvas.width / 2 + 150, canvas.height / 2 - 20, r)
+    nodes.push(n4);
+    // E
+    let n5 = new Node(canvas.width / 2 - 125, canvas.height / 2 + 100, r)
+    nodes.push(n5);
+    // F
+    let n6 = new Node(canvas.width / 2 + 10, canvas.height / 2 + 150, r);
+    nodes.push(n6);
     for (let i=0; i<nodes.length; i++) {
         addToDropDown(nodes[i].name, sourceSelect);
         addToDropDown(nodes[i].name, destinationSelect);
     }
     
     addToEdgeSet(n1,n2);
-    addToEdgeSet(n1,n3);
+    addToEdgeSet(n1,n4);
+    addToEdgeSet(n1,n6);
     addToEdgeSet(n2,n3);
+    addToEdgeSet(n3,n5);
+    addToEdgeSet(n2,n6);
+    addToEdgeSet(n3,n4);
+    addToEdgeSet(n4,n6);
+    addToEdgeSet(n2,n3);
+
     drawCanvas();
 }
 // ========================================================================================
@@ -425,9 +441,10 @@ for(item of navItems) {
 
 function runAlgo(e) {
     e.preventDefault();
+    if (nodes.length == 0) return;
+
     g = buildGraph();
 
-    
     const source = nodes[sourceSelect.value.charCodeAt()-65];
     const destination = nodes[destinationSelect.value.charCodeAt()-65];
     drawCanvas();
