@@ -77,9 +77,11 @@ body {
     width: 100%;
 }
 
-#random-btn {
-    background-color: black;
+/* #random-btn {
 }
+
+#clear-btn {
+} */
 
 .small {
     width: 50%;

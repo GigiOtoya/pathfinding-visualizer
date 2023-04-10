@@ -27,6 +27,8 @@ const edgeBtn = document.getElementById("add-edge-btn");
 const runBtn = document.getElementById("run-btn");
 const sourceSelect = document.getElementById("source-select");
 const destinationSelect = document.getElementById("destination-select");
+const randomBtn = document.getElementById("random-btn");
+const clearBtn = document.getElementById("clear-btn");
 
 // ========================================================================================
 // Event Listeners
@@ -36,6 +38,8 @@ selectBtn.addEventListener("click", select);
 nodeBtn.addEventListener("click", addNode);
 edgeBtn.addEventListener("click", addEdge);
 runBtn.addEventListener("click", runAlgo);
+randomBtn.addEventListener("click", randomGraph);
+clearBtn.addEventListener("click", clearGraph);
 canvas.addEventListener("mousemove", (e) => {
     let mouseEvent = e;
     mouseMove(canvas, mouseEvent);
@@ -144,61 +148,22 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-const randomBtn = document.getElementById("random-btn");
-randomBtn.addEventListener("click", randomGraph);
-
-function randomGraph(e) {
-    e.preventDefault();
-    
+function resetAll() {
     edgeSet = {};
     nodes.length = 0;
-    const n = 5;
     sourceSelect.length = 0;
     destinationSelect.length = 0;
-    while (nodes.length < n) {
-        const node = new Node(
-            randomInt(20, canvas.width-20),
-            randomInt(20, canvas.height-20),
-            20
-        );
-            
-        let overlapping = false;
-
-        for (let j = 0; j < nodes.length; j++) {
-            if (getDistance(node, nodes[j]) < (node.r + nodes[j].r)*3) {
-                overlapping = true;
-                break;
-            }
-        }
-        if (!overlapping) {
-            nodes.push(node);
-            addToDropDown(node.name, sourceSelect);
-            addToDropDown(node.name, destinationSelect);
-        }
-    }
-
-    // max edges = n*(n-1)/2
-    while (Object.keys(edgeSet).length < (n*(n-1)/2)) {
-        const node1 = nodes[randomInt(0, nodes.length-1)];
-        const node2 = nodes[randomInt(0, nodes.length-1)];
-        if (node1 != node2) {
-            addToEdgeSet(node1, node2);
-        }
-    }
-    drawCanvas();
 }
-
 
 // ========================================================================================
 // Drawing Functions
 // ========================================================================================
 function drawCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = DARK_PASTEL;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    resetCanvas();
     drawEdges();
     drawNodes();
 }
+
 function resetCanvas(){
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = DARK_PASTEL;
@@ -488,6 +453,49 @@ function sliderValue() {
     return speed==0? 100 : speed;
 }
 
+function randomGraph(e) {
+    e.preventDefault();
+    resetAll();
+
+    const n = 5;
+    while (nodes.length < n) {
+        const node = new Node(
+            randomInt(20, canvas.width-20),
+            randomInt(20, canvas.height-20),
+            20
+        );
+            
+        let overlapping = false;
+
+        for (let j = 0; j < nodes.length; j++) {
+            if (getDistance(node, nodes[j]) < (node.r + nodes[j].r)*3) {
+                overlapping = true;
+                break;
+            }
+        }
+        if (!overlapping) {
+            nodes.push(node);
+            addToDropDown(node.name, sourceSelect);
+            addToDropDown(node.name, destinationSelect);
+        }
+    }
+
+    // max edges = n*(n-1)/2
+    while (Object.keys(edgeSet).length < (n*(n-1)/2)) {
+        const node1 = nodes[randomInt(0, nodes.length-1)];
+        const node2 = nodes[randomInt(0, nodes.length-1)];
+        if (node1 != node2) {
+            addToEdgeSet(node1, node2);
+        }
+    }
+    drawCanvas();
+}
+
+function clearGraph(e) {
+    e.preventDefault();
+    resetCanvas();
+    resetAll();
+}
 // ========================================================================================
 // Algorithms
 // ========================================================================================
@@ -533,8 +541,6 @@ function dijkstra(graph, source, destination) {
         }
         pathTrace(paths, source, destination);
     })();
-    // pathTrace(paths, source, destination);
-    // animate(drawCommands);
 }
 
 const delay = (ms) => new Promise(function(resolve) {
