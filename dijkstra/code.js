@@ -98,10 +98,15 @@ function Graph() {
     };
 
     this.addEdgeToGraph = function (source, neighbor) {
-        const distance = getDistance(source, neighbor);
-        // distance set for both nodes connected by edge
-        this.adjacencyList.get(source).set(neighbor, distance);
-        this.adjacencyList.get(neighbor).set(source, distance);
+        // const distance = getDistance(source, neighbor);
+        // // distance set for both nodes connected by edge
+        // this.adjacencyList.get(source).set(neighbor, distance);
+        // this.adjacencyList.get(neighbor).set(source, distance);
+
+        // set by edge weight
+        const edge = edgeSet[getEdgeKey(source, neighbor)]
+        this.adjacencyList.get(source).set(neighbor, edge.weight)
+        this.adjacencyList.get(neighbor).set(source, edge.weight)
     };
 
     this.printGraph = function() {
@@ -138,6 +143,14 @@ function getMidpoint(node1, node2) {
 }
 
 function addToEdgeSet(node1, node2) {
+    const key = getEdgeKey(node1, node2);
+
+    if(!edgeSet[key]) {
+        edgeSet[key] = {node1, node2, weight: setWeight()};
+    }
+}
+
+function getEdgeKey(node1, node2) {
     const nodeValue1 = node1.name.charCodeAt();
     const nodeValue2 = node2.name.charCodeAt();
     const min = Math.min(nodeValue1, nodeValue2);
@@ -153,10 +166,18 @@ function addToEdgeSet(node1, node2) {
         start = node2.name;
         end = node1.name;
     }
+    return `${start}-${end}`; 
+}
 
-    const key = `${start}-${end}`; 
-    if(!edgeSet[key]) {
-        edgeSet[key] = {node1, node2};
+function setWeight() {
+    if (f == 0) return randomInt(1,10);
+    if (f == 1 || f == 2) return randomInt(-10,10);
+    if (f == 3 || f == 4 || f == 5) return 1;
+}
+
+function adjustWeights() {
+    for (let edge of Object.values(edgeSet)) {
+        edge.weight = setWeight();
     }
 }
 
@@ -231,14 +252,15 @@ function drawEdges() {
 
 function annotateEdge(node1, node2) {
     const midPoint = getMidpoint(node1, node2);
-    const distance = getDistance(node1, node2);
+    // const distance = getDistance(node1, node2);
+    const edge = edgeSet[getEdgeKey(node1, node2)]
     let dx = node2.x - node1.x;
     let dy = node2.y - node1.y;
 
     ctx.fillStyle = MINT;
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
-    ctx.font = "14px sans-serif";
+    ctx.font = "16px sans-serif";
 
     ctx.save();
     // get angle to where midpoint would be if translated.
@@ -250,7 +272,7 @@ function annotateEdge(node1, node2) {
 
     ctx.translate(midPoint.x, midPoint.y);
     ctx.rotate(angle);
-    ctx.fillText(`d = ${distance}`, 0, 0);
+    ctx.fillText(`w = ${edge.weight}`, 0, 0);
     ctx.restore();
 }
 
@@ -436,6 +458,8 @@ for(item of navItems) {
         }
         this.classList.add("active");
         f = this.value;
+        adjustWeights();
+        drawCanvas();
     });
 }
 
@@ -521,8 +545,6 @@ function dijkstra(graph, source, destination) {
     const distances = new Map();
     const paths = new Map();
     const heapQ = new MinHeap();
-    const drawCommands = []
-    
 
     for (let node of graph.keys()) {
         distances.set(node, Infinity);
@@ -534,7 +556,7 @@ function dijkstra(graph, source, destination) {
     (async () => {
         while (heapQ.minHeap.length) {
             // get node with least total distance
-            const [curDist, curNode] = heapQ.heapPop();
+            const [curWeight, curNode] = heapQ.heapPop();
             if (!visited.has(curNode)) {
                 visited.add(curNode);
 
@@ -543,11 +565,11 @@ function dijkstra(graph, source, destination) {
                 await delay(sliderValue());
 
                 for (let [neighbor, weight] of graph.get(curNode)) {
-                    const nextDist = curDist + weight;
-                    if (!visited.has(neighbor) && nextDist < distances.get(neighbor)) {
-                        distances.set(neighbor, nextDist);
+                    const nextWeight = curWeight + weight;
+                    if (!visited.has(neighbor) && nextWeight < distances.get(neighbor)) {
+                        distances.set(neighbor, nextWeight);
                         paths.set(neighbor, curNode);
-                        heapQ.heapPush([nextDist, neighbor]);
+                        heapQ.heapPush([nextWeight, neighbor]);
                         drawEdge(curNode, neighbor, AZURE, 4);
                         drawNode(curNode, GREY, AZURE, 4);
                         drawNode(neighbor);
