@@ -92,9 +92,12 @@ function initialize() {
 // ========================================================================================
 function Graph() {
     this.adjacencyList = new Map();
+    this.nodes = [];
+    this.edges = {};
 
     this.insertNodeToGraph = function (node) {
         this.adjacencyList.set(node, new Map());
+        this.nodes.push(node);
     };
 
     this.addEdgeToGraph = function (source, neighbor) {
@@ -107,6 +110,7 @@ function Graph() {
         const edge = edgeSet[getEdgeKey(source, neighbor)]
         this.adjacencyList.get(source).set(neighbor, edge.weight)
         this.adjacencyList.get(neighbor).set(source, edge.weight)
+        this.edges[edge] = edge.weight;
     };
 
     this.printGraph = function() {
@@ -170,8 +174,8 @@ function getEdgeKey(node1, node2) {
 }
 
 function setWeight() {
-    if (f == 0) return randomInt(1,10);
-    if (f == 1 || f == 2) return randomInt(-10,10);
+    if (f == 0 || f == 1) return randomInt(1,10);
+    if (f == 2) return randomInt(-10,10);
     if (f == 3 || f == 4 || f == 5) return 1;
 }
 
@@ -232,6 +236,15 @@ function drawNode(node, fc = GREY, sc = WHITE, lw = 3) {
 
 function drawEdge(p1, p2, lc=WHITE, lw=2, ls = STRAIGHT_LINE) {
     ctx.beginPath();
+    // if (addingEdge) {
+    //     ctx.moveTo(p1.x, p1.y);
+    //     ctx.lineTo(p2.x, p2.y);
+    // }
+    // else {
+    //     const v = getVector(p1, p2);
+    //     ctx.moveTo(v.p1.x, v.p1.y);
+    //     ctx.lineTo(v.p2.x, v.p2.y);
+    // }
     ctx.moveTo(p1.x, p1.y);
     ctx.lineTo(p2.x, p2.y);
     ctx.setLineDash(ls);
@@ -248,6 +261,24 @@ function drawEdges() {
         drawEdge(node1, node2);
         annotateEdge(node1, node2);
     }
+}
+
+function getVector(p1, p2) {
+    const deltaX = p1.x - p2.x;
+    const deltaY = p1.y - p2.y;
+
+    const length = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+    const normal = {x: deltaX/length, y: deltaY/length}; 
+    const p_1 = {
+        x: p1.x - ((p1.r+2) * normal.x),
+        y: p1.y - ((p1.r+2) * normal.y)
+    };
+
+    const p_2 = {
+        x: p2.x + ((p2.r+2)* normal.x),
+        y: p2.y + ((p2.r+2) * normal.y)
+    };
+    return {p1: p_1, p2: p_2};
 }
 
 function annotateEdge(node1, node2) {
@@ -446,7 +477,7 @@ function buildGraph() {
     for (let i=0; i<edges.length; i++) {
         g.addEdgeToGraph(edges[i].node1, edges[i].node2);
     }
-    return g.adjacencyList;
+    return g;
 }
 
 let f = 0;
@@ -463,29 +494,46 @@ for(item of navItems) {
     });
 }
 
-function runAlgo(e) {
+function disableAll() {
+    nodeBtn.disabled = true;
+    edgeBtn.disabled = true;
+    runBtn.disabled = true;
+    randomBtn.disabled = true;
+    clearBtn.disabled = true;
+}
+function enableAll() {
+    nodeBtn.disabled = false;
+    edgeBtn.disabled = false;
+    runBtn.disabled = false;
+    randomBtn.disabled = false;
+    clearBtn.disabled = false;
+}
+
+async function runAlgo(e) {
     e.preventDefault();
+    disableAll();
     if (nodes.length == 0) return;
 
     g = buildGraph();
-
+    
     const source = nodes[sourceSelect.value.charCodeAt()-65];
     const destination = nodes[destinationSelect.value.charCodeAt()-65];
     drawCanvas();
     switch(f) {
-        case 0 : dijkstra(g, source, destination);
+        case 0 : await dijkstra(g.adjacencyList, source, destination);
         break;
-        case 1 : floydWarshall();
+        case 1 : await floydWarshall(g);
         break;
-        case 2 : aStarSearch();
+        case 2 : bellmanFord(g.adjacencyList, source ,destination);
         break;
-        case 3 : depthFirstSearchi(g, source, destination);
+        case 3 : await depthFirstSearchi(g.adjacencyList, source, destination);
         break;
-        case 4 : breadthFirstSearch(g, source, destination);
+        case 4 : await breadthFirstSearch(g.adjacencyList, source, destination);
         break;
         case 5 : bestFirstSearch();
         break;
     }
+    enableAll();
 }
 
 function sliderValue() {
@@ -540,7 +588,7 @@ function clearGraph(e) {
 // ========================================================================================
 // Algorithms
 // ========================================================================================
-function dijkstra(graph, source, destination) {
+async function dijkstra(graph, source, destination) {
     const visited = new Set();
     const distances = new Map();
     const paths = new Map();
@@ -552,34 +600,33 @@ function dijkstra(graph, source, destination) {
     distances.set(source, 0);
     paths.set(source, null);
     heapQ.heapPush([0, source]);
-    
-    (async () => {
-        while (heapQ.minHeap.length) {
-            // get node with least total distance
-            const [curWeight, curNode] = heapQ.heapPop();
-            if (!visited.has(curNode)) {
-                visited.add(curNode);
 
-                drawNode(curNode, GREY, AZURE, 4);
-                console.log(visited);
-                await delay(sliderValue());
 
-                for (let [neighbor, weight] of graph.get(curNode)) {
-                    const nextWeight = curWeight + weight;
-                    if (!visited.has(neighbor) && nextWeight < distances.get(neighbor)) {
-                        distances.set(neighbor, nextWeight);
-                        paths.set(neighbor, curNode);
-                        heapQ.heapPush([nextWeight, neighbor]);
-                        drawEdge(curNode, neighbor, AZURE, 4);
-                        drawNode(curNode, GREY, AZURE, 4);
-                        drawNode(neighbor);
-                        await delay(sliderValue());
-                    }
+    while (heapQ.minHeap.length) {
+        // get node with least total distance
+        const [curWeight, curNode] = heapQ.heapPop();
+        if (!visited.has(curNode)) {
+            visited.add(curNode);
+
+            drawNode(curNode, GREY, AZURE, 4);
+            console.log(visited);
+            await delay(sliderValue());
+
+            for (let [neighbor, weight] of graph.get(curNode)) {
+                const nextWeight = curWeight + weight;
+                if (!visited.has(neighbor) && nextWeight < distances.get(neighbor)) {
+                    distances.set(neighbor, nextWeight);
+                    paths.set(neighbor, curNode);
+                    heapQ.heapPush([nextWeight, neighbor]);
+                    drawEdge(curNode, neighbor, AZURE, 4);
+                    drawNode(curNode, GREY, AZURE, 4);
+                    drawNode(neighbor);
+                    await delay(sliderValue());
                 }
             }
         }
-        pathTrace(paths, source, destination);
-    })();
+    }
+    pathTrace(paths, source, destination);
 }
 
 const delay = (ms) => new Promise(function(resolve) {
@@ -677,40 +724,88 @@ function MinHeap() {
     }
 }
 
-function floydWarshall() {
+async function floydWarshall(G) {
+    const g = G.adjacencyList;
+    const distances = [];
+    // initialize
+    for (let i = 0; i < [...g.keys()].length; i++) {
+        distances[i] = [];
+        for (let j = 0; j < [...g.keys()].length; j++) {
+            distances[i][j] = (i == j)? 0 : Infinity;
+        }
+    }
+    // fill edge weights
+    for (let u of [...g.keys()]) {
+        for (let [v , w] of g.get(u)) {
+            distances[u.name.charCodeAt()-65][v.name.charCodeAt()-65] = w;
+        }
+    }
 
+    for (let k = 0; k < [...g.keys()].length; k++) {
+        drawNode(G.nodes[k], GREY, AZURE, 4);
+        await delay(sliderValue());
+
+        for (let i = 0; i < [...g.keys()].length; i++) {
+            for (let j = 0; j < [...g.keys()].length; j++) {
+                if (i == j) {
+                    continue;
+                }
+                else if (distances[i][j] > distances[i][k] + distances[k][j]) {
+                    distances[i][j] = distances[i][k] + distances[k][j];
+                }
+                if (edgeSet[getEdgeKey(G.nodes[i], G.nodes[j])]) {
+                    drawEdge(G.nodes[i], G.nodes[j], AZURE, 4);
+                }
+                await delay(sliderValue());
+            }
+        }
+    drawNode(G.nodes[k]);
+    }
+    console.log(distances)
+}
+
+function bellmanFord(g, start, end) {
+    distances = new Map();
+    for (let node of g.keys()) {
+        distances.set(node, Infinity);
+    }
+    distances.set(source, 0);
+
+    let node = start;
+    for (let i = 0; i < g.keys().length-1; i++) {
+
+        const visited = new Set();
+    }
 }
 
 function aStarSearch() {
 
 }
 
-function depthFirstSearchi(g, start, end) {
+async function depthFirstSearchi(g, start, end) {
     const stack = [start];
     const visited = new Set([start]);
     const paths = new Map([[start, null]]);
 
-    (async () => {
-        while (stack.length) {
-            console.log([...stack])
-            const node = stack.pop();
-            drawNode(node, GREY, AZURE, 4);
-            await delay(sliderValue());
+    while (stack.length) {
+        console.log([...stack])
+        const node = stack.pop();
+        drawNode(node, GREY, AZURE, 4);
+        await delay(sliderValue());
 
-            for (neighbor of [...g.get(node).keys()]) {
-                if (!visited.has(neighbor)) {
-                    stack.push(neighbor);
-                    visited.add(neighbor);
-                    paths.set(neighbor, node);
-                    drawEdge(node, neighbor, AZURE, 4);
-                    drawNode(node, GREY, AZURE, 4);
-                    drawNode(neighbor);
-                    await delay(sliderValue());
-                }
+        for (neighbor of [...g.get(node).keys()]) {
+            if (!visited.has(neighbor)) {
+                stack.push(neighbor);
+                visited.add(neighbor);
+                paths.set(neighbor, node);
+                drawEdge(node, neighbor, AZURE, 4);
+                drawNode(node, GREY, AZURE, 4);
+                drawNode(neighbor);
+                await delay(sliderValue());
             }
         }
-        pathTrace(paths, start, end);
-    })();
+    }
+    pathTrace(paths, start, end);
 }
 
 
@@ -734,31 +829,29 @@ function depthFirstSearchi(g, start, end) {
 //     dfs(start);
 // }
 
-function breadthFirstSearch(g, start, end) {
+async function breadthFirstSearch(g, start, end) {
     const Q = [start];
     const visited = new Set([start]);
     const paths = new Map([[start, null]]);
 
-    (async () => {
-        while (Q.length) {
-            const node = Q.shift(0);
-            drawNode(node, GREY, AZURE, 4);
-            await delay(sliderValue());
+    while (Q.length) {
+        const node = Q.shift(0);
+        drawNode(node, GREY, AZURE, 4);
+        await delay(sliderValue());
 
-            for (neighbor of [...g.get(node).keys()]) {
-                if (!visited.has(neighbor)) {
-                    Q.push(neighbor);
-                    visited.add(neighbor);
-                    paths.set(neighbor, node);
-                    drawEdge(node, neighbor, AZURE, 4);
-                    drawNode(node, GREY, AZURE, 4);
-                    drawNode(neighbor);
-                    await delay(sliderValue());
-                }
+        for (neighbor of [...g.get(node).keys()]) {
+            if (!visited.has(neighbor)) {
+                Q.push(neighbor);
+                visited.add(neighbor);
+                paths.set(neighbor, node);
+                drawEdge(node, neighbor, AZURE, 4);
+                drawNode(node, GREY, AZURE, 4);
+                drawNode(neighbor);
+                await delay(sliderValue());
             }
         }
-        pathTrace(paths, start, end);
-    })();
+    }
+    pathTrace(paths, start, end);
 }
 
 function bestFirstSearch() {

@@ -102,15 +102,18 @@ body {
     writing-mode:sideways-lr;
     width: 100%;
 }
-.control-panel button:hover {
+.control-panel button:hover:enabled {
     background-color: #1b1b1b;
     cursor: pointer;
 }
 
-.control-panel button:active {
+.control-panel button:active:enabled {
     transform: scale(.99, .99);
 }
 
+.control-panel button:hover:disabled {
+    cursor: not-allowed;
+}
 .icon {
     height: 20px;
     padding: 5px;
