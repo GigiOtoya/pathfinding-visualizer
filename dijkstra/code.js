@@ -8,7 +8,6 @@ const DARK_PASTEL = "#1b1b1b";
 const CYAN = "#00FEFE";
 const AZURE = "#336DFF";
 const WHITE = "#FFFFFF";
-const MINT = "#3BB3A0";
 const GREY = "#3c4043";
 const GREEN = "#00FF00";
 
@@ -236,17 +235,17 @@ function drawNode(node, fc = GREY, sc = WHITE, lw = 3) {
 
 function drawEdge(p1, p2, lc=WHITE, lw=2, ls = STRAIGHT_LINE) {
     ctx.beginPath();
-    // if (addingEdge) {
-    //     ctx.moveTo(p1.x, p1.y);
-    //     ctx.lineTo(p2.x, p2.y);
-    // }
-    // else {
-    //     const v = getVector(p1, p2);
-    //     ctx.moveTo(v.p1.x, v.p1.y);
-    //     ctx.lineTo(v.p2.x, v.p2.y);
-    // }
-    ctx.moveTo(p1.x, p1.y);
-    ctx.lineTo(p2.x, p2.y);
+    if (addingEdge) {
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+    }
+    else {
+        const v = getVector(p1, p2);
+        ctx.moveTo(v.p1.x, v.p1.y);
+        ctx.lineTo(v.p2.x, v.p2.y);
+    }
+    // ctx.moveTo(p1.x, p1.y);
+    // ctx.lineTo(p2.x, p2.y);
     ctx.setLineDash(ls);
     ctx.lineWidth = lw;
     ctx.strokeStyle = lc;
@@ -288,7 +287,7 @@ function annotateEdge(node1, node2) {
     let dx = node2.x - node1.x;
     let dy = node2.y - node1.y;
 
-    ctx.fillStyle = MINT;
+    ctx.fillStyle = CYAN;
     ctx.textBaseline = "bottom";
     ctx.textAlign = "center";
     ctx.font = "16px sans-serif";
@@ -323,9 +322,9 @@ function Node(x, y, r) {
 function mouseMove(canvas, e) {
     let mousePosition = getMouseCoordinates(e);
     // console.log(currNode);
-    console.log(`x: ${e.clientX}, y: ${e.clientY}`);
-    console.log(mousePosition);
-    console.log(boundingRect);
+    // console.log(`x: ${e.clientX}, y: ${e.clientY}`);
+    // console.log(mousePosition);
+    // console.log(boundingRect);
 
     // keep currNode from changing once we have it
     if (mouseOnNode(mousePosition.x, mousePosition.y)) {
@@ -337,12 +336,12 @@ function mouseMove(canvas, e) {
         count = 0;
         canvas.style.cursor = "default";
     }
-    console.log(drawingEdge);
+    // console.log(drawingEdge);
     if (addingEdge) {
         canvas.style.cursor = "crosshair";
         if (drawingEdge) {
             resetCanvas();
-            drawEdge(currNode, mousePosition, MINT, 2, DOTTED_LINE);
+            drawEdge(currNode, mousePosition, CYAN, 2, DOTTED_LINE);
             drawEdges();
             drawNodes();
         }
@@ -500,6 +499,9 @@ function disableAll() {
     runBtn.disabled = true;
     randomBtn.disabled = true;
     clearBtn.disabled = true;
+    dragging = false;
+    addingEdge = false;
+
 }
 function enableAll() {
     nodeBtn.disabled = false;
@@ -727,42 +729,76 @@ function MinHeap() {
 async function floydWarshall(G) {
     const g = G.adjacencyList;
     const distances = [];
+    const prev = [];
     // initialize
     for (let i = 0; i < [...g.keys()].length; i++) {
         distances[i] = [];
+        prev[i] = [];
         for (let j = 0; j < [...g.keys()].length; j++) {
             distances[i][j] = (i == j)? 0 : Infinity;
+            prev[i][j] = null;
         }
     }
     // fill edge weights
-    for (let u of [...g.keys()]) {
-        for (let [v , w] of g.get(u)) {
-            distances[u.name.charCodeAt()-65][v.name.charCodeAt()-65] = w;
+    for (let U of [...g.keys()]) {
+        for (let [V , w] of g.get(U)) {
+            const u = U.name.charCodeAt()-65;
+            const v = V.name.charCodeAt()-65;
+            distances[u][v] = w;
+            prev[u][v] = u;
         }
     }
 
     for (let k = 0; k < [...g.keys()].length; k++) {
-        drawNode(G.nodes[k], GREY, AZURE, 4);
-        await delay(sliderValue());
+        // drawNode(G.nodes[k], GREY, GREEN, 4);
+        // await delay(sliderValue());
 
         for (let i = 0; i < [...g.keys()].length; i++) {
+            if (i == k) {
+                continue;
+            }
             for (let j = 0; j < [...g.keys()].length; j++) {
-                if (i == j) {
+                if (i == j || j == k) {
                     continue;
                 }
-                else if (distances[i][j] > distances[i][k] + distances[k][j]) {
-                    distances[i][j] = distances[i][k] + distances[k][j];
-                }
-                if (edgeSet[getEdgeKey(G.nodes[i], G.nodes[j])]) {
-                    drawEdge(G.nodes[i], G.nodes[j], AZURE, 4);
-                }
+                // highlight current edge
+                drawEdge(G.nodes[i], G.nodes[j], "red", 4, DOTTED_LINE);
+                drawNode(G.nodes[i], GREY, "red", 4);
+                drawNode(G.nodes[j], GREY, "red", 4);
                 await delay(sliderValue());
+                // }
+
+                if (distances[i][j] > distances[i][k] + distances[k][j]) {
+                    distances[i][j] = distances[i][k] + distances[k][j];
+                    prev[i][j] = prev[k][j];
+                    // highlight new path found
+                    // drawEdge(G.nodes[i], G.nodes[k], GREEN, 4);
+                    // drawEdge(G.nodes[k], G.nodes[j], GREEN, 4);
+                    trace(prev, G.nodes, i, j);
+                    await delay(sliderValue()); 
+                }
+                drawCanvas();
             }
+            
         }
     drawNode(G.nodes[k]);
     }
-    console.log(distances)
 }
+
+function trace(path, nodes, i, j) {
+    let u = j
+    let v = path[i][j];
+
+    while (u != null && v != null) {
+        drawEdge(nodes[u], nodes[v], GREEN, 4);
+        drawNode(nodes[u], GREY, GREEN, 4);
+        drawNode(nodes[v], GREY, GREEN, 4);
+        u = v;
+        v = path[i][u];
+    }
+
+}
+
 
 function bellmanFord(g, start, end) {
     distances = new Map();

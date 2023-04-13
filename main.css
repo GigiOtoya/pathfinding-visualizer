@@ -111,6 +111,9 @@ body {
     transform: scale(.99, .99);
 }
 
+.control-panel button:disabled {
+    color: grey;
+}
 .control-panel button:hover:disabled {
     cursor: not-allowed;
 }
