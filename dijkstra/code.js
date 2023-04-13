@@ -548,7 +548,7 @@ function randomGraph(e) {
     e.preventDefault();
     resetAll();
 
-    const n = 5;
+    const n = 10;
     while (nodes.length < n) {
         const node = new Node(
             randomInt(20, canvas.width-20),
@@ -736,7 +736,7 @@ async function floydWarshall(G) {
         prev[i] = [];
         for (let j = 0; j < [...g.keys()].length; j++) {
             distances[i][j] = (i == j)? 0 : Infinity;
-            prev[i][j] = null;
+            prev[i][j] = (i == j)? i: null;
         }
     }
     // fill edge weights
@@ -750,7 +750,7 @@ async function floydWarshall(G) {
     }
 
     for (let k = 0; k < [...g.keys()].length; k++) {
-        // drawNode(G.nodes[k], GREY, GREEN, 4);
+        // drawNode(G.nodes[k], GREEN);
         // await delay(sliderValue());
 
         for (let i = 0; i < [...g.keys()].length; i++) {
@@ -778,25 +778,33 @@ async function floydWarshall(G) {
                     await delay(sliderValue()); 
                 }
                 drawCanvas();
+                // drawNode(G.nodes[k], GREEN);
             }
             
         }
-    drawNode(G.nodes[k]);
+    // drawNode(G.nodes[k]);
+    drawCanvas();
     }
+    console.log(prev);
 }
 
-function trace(path, nodes, i, j) {
-    let u = j
-    let v = path[i][j];
-
-    while (u != null && v != null) {
-        drawEdge(nodes[u], nodes[v], GREEN, 4);
-        drawNode(nodes[u], GREY, GREEN, 4);
+function trace(prev, nodes, i, j) {
+    let u = i;
+    let v = j;
+    // v != prev[u]prev[u][v]
+    while (u != v &&(prev[u][v] != null)) {
+        console.log(`u: ${u}, v: ${v}`);
+        drawEdge(nodes[v], nodes[prev[u][v]], GREEN, 4);
         drawNode(nodes[v], GREY, GREEN, 4);
-        u = v;
-        v = path[i][u];
+        drawNode(nodes[prev[u][v]], GREY, GREEN, 4);
+        if (v == prev[u][prev[u][v]]) {
+            console.log("FOUND THAT SHIT!!!")
+            break;
+        }
+        else {
+            v = prev[u][v];
+        }
     }
-
 }
 
 
