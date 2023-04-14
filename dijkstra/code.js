@@ -175,7 +175,8 @@ function getEdgeKey(node1, node2) {
 function setWeight() {
     if (f == 0 || f == 1) return randomInt(1,10);
     if (f == 2) return randomInt(-10,10);
-    if (f == 3 || f == 4 || f == 5) return 1;
+    if (f == 3 || f == 4) return 1;
+    if (f == 5 || f == 6) return randomInt(1,10);
 }
 
 function adjustWeights() {
@@ -234,6 +235,9 @@ function drawNode(node, fc = GREY, sc = WHITE, lw = 3) {
 }
 
 function drawEdge(p1, p2, lc=WHITE, lw=2, ls = STRAIGHT_LINE) {
+    if (p1 == null || p2 == null) {
+        return;
+    }
     ctx.beginPath();
     if (addingEdge) {
         ctx.moveTo(p1.x, p1.y);
@@ -513,9 +517,9 @@ function enableAll() {
 
 async function runAlgo(e) {
     e.preventDefault();
-    disableAll();
     if (nodes.length == 0) return;
 
+    disableAll();
     g = buildGraph();
     
     const source = nodes[sourceSelect.value.charCodeAt()-65];
@@ -532,7 +536,9 @@ async function runAlgo(e) {
         break;
         case 4 : await breadthFirstSearch(g.adjacencyList, source, destination);
         break;
-        case 5 : bestFirstSearch();
+        case 5 : await prim(g.adjacencyList, source);
+        break;
+        case 6 : await kruskal(g.adjacencyList);
         break;
     }
     enableAll();
@@ -750,8 +756,7 @@ async function floydWarshall(G) {
     }
 
     for (let k = 0; k < [...g.keys()].length; k++) {
-        // drawNode(G.nodes[k], GREEN);
-        // await delay(sliderValue());
+        drawNode(G.nodes[k], AZURE);
 
         for (let i = 0; i < [...g.keys()].length; i++) {
             if (i == k) {
@@ -766,23 +771,18 @@ async function floydWarshall(G) {
                 drawNode(G.nodes[i], GREY, "red", 4);
                 drawNode(G.nodes[j], GREY, "red", 4);
                 await delay(sliderValue());
-                // }
 
                 if (distances[i][j] > distances[i][k] + distances[k][j]) {
                     distances[i][j] = distances[i][k] + distances[k][j];
                     prev[i][j] = prev[k][j];
-                    // highlight new path found
-                    // drawEdge(G.nodes[i], G.nodes[k], GREEN, 4);
-                    // drawEdge(G.nodes[k], G.nodes[j], GREEN, 4);
                     trace(prev, G.nodes, i, j);
                     await delay(sliderValue()); 
                 }
                 drawCanvas();
-                // drawNode(G.nodes[k], GREEN);
+                drawNode(G.nodes[k], AZURE);
             }
             
         }
-    // drawNode(G.nodes[k]);
     drawCanvas();
     }
     console.log(prev);
@@ -820,10 +820,6 @@ function bellmanFord(g, start, end) {
 
         const visited = new Set();
     }
-}
-
-function aStarSearch() {
-
 }
 
 async function depthFirstSearchi(g, start, end) {
@@ -898,7 +894,46 @@ async function breadthFirstSearch(g, start, end) {
     pathTrace(paths, start, end);
 }
 
-function bestFirstSearch() {
+async function prim(g, start) {
+    const visited = new Set();
+    const q = new MinHeap();
+    const prev = new Map();
+    prev.set(start, {p: null, w: 0});
+    q.heapPush([0, start]);
+
+    let cost = 0;
+    while (q.minHeap.length) {
+        const [w, u] = q.heapPop();
+        
+        if (visited.has(u)) {
+            continue;
+        }
+
+        drawNode(u, GREY, GREEN, 4);
+        await delay(sliderValue());
+        drawEdge(u, prev.get(u).p, GREEN, 4);
+        await delay(sliderValue()); 
+        // drawNode(u, GREY, GREEN, 4);
+               
+        for (let [v, w] of [...g.get(u)]) {
+            if (!visited.has(v)) {
+                q.heapPush([w, v]);
+                if (!prev.has(v)) {
+                    prev.set(v, {p: u, w: w});
+                }
+                else if (w < prev.get(v).w) {
+                    prev.set(v, {p: u, w: w});
+
+                }
+            }
+        }
+        cost += w;
+        visited.add(u);
+    }
+    console.log(cost);
+}
+
+async function kruskal(g) {
 
 }
 
