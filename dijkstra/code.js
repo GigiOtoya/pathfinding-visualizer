@@ -913,7 +913,6 @@ async function prim(g, start) {
         await delay(sliderValue());
         drawEdge(u, prev.get(u).p, GREEN, 4);
         await delay(sliderValue()); 
-        // drawNode(u, GREY, GREEN, 4);
                
         for (let [v, w] of [...g.get(u)]) {
             if (!visited.has(v)) {
