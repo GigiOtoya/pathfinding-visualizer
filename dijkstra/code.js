@@ -92,7 +92,7 @@ function initialize() {
 function Graph() {
     this.adjacencyList = new Map();
     this.nodes = [];
-    this.edges = {};
+    this.edges = [];
 
     this.insertNodeToGraph = function (node) {
         this.adjacencyList.set(node, new Map());
@@ -109,7 +109,7 @@ function Graph() {
         const edge = edgeSet[getEdgeKey(source, neighbor)]
         this.adjacencyList.get(source).set(neighbor, edge.weight)
         this.adjacencyList.get(neighbor).set(source, edge.weight)
-        this.edges[edge] = edge.weight;
+        this.edges.push([edge.weight, source, neighbor]);
     };
 
     this.printGraph = function() {
@@ -476,7 +476,7 @@ function buildGraph() {
     for (let i=0; i<nodes.length; i++) {
         g.insertNodeToGraph(nodes[i]);
     }
-    edges = Object.values(edgeSet);
+    const edges = Object.values(edgeSet);
     for (let i=0; i<edges.length; i++) {
         g.addEdgeToGraph(edges[i].node1, edges[i].node2);
     }
@@ -530,7 +530,7 @@ async function runAlgo(e) {
         break;
         case 1 : await floydWarshall(g);
         break;
-        case 2 : bellmanFord(g.adjacencyList, source ,destination);
+        case 2 : await bellmanFord(g.adjacencyList, source ,destination);
         break;
         case 3 : await depthFirstSearchi(g.adjacencyList, source, destination);
         break;
@@ -538,7 +538,7 @@ async function runAlgo(e) {
         break;
         case 5 : await prim(g.adjacencyList, source);
         break;
-        case 6 : await kruskal(g.adjacencyList);
+        case 6 : await kruskal(g);
         break;
     }
     enableAll();
@@ -798,7 +798,6 @@ function trace(prev, nodes, i, j) {
         drawNode(nodes[v], GREY, GREEN, 4);
         drawNode(nodes[prev[u][v]], GREY, GREEN, 4);
         if (v == prev[u][prev[u][v]]) {
-            console.log("FOUND THAT SHIT!!!")
             break;
         }
         else {
@@ -933,7 +932,51 @@ async function prim(g, start) {
 }
 
 async function kruskal(g) {
+    function find(node) {
+        let u = node.name.charCodeAt()-65;
+        while (t[u] != u) {
+            u = t[u];
+        }
+        return u;
+    }
 
+    function union(u, v) {
+        let x = find(u);
+        let y = find(v);
+        t[y] = x;
+    }
+
+    let cost = 0;
+    const q = new MinHeap();
+    q.buildHeap(g.edges);
+    // tree for each node
+    const t = [];
+    for (let i = 0; i < g.nodes.length; i++) {
+        t[i] = i;
+    }
+
+
+    while (q.minHeap.length) {
+        // get smallest edge by weight
+        const [w, u, v] = q.heapPop();
+
+        if (find(u) == find(v)) {
+            drawEdge(u, v, 'red', 4);
+            await delay(sliderValue());
+            drawEdge(u, v, DARK_PASTEL, 6);
+            drawEdge(u, v);
+            continue;
+        }
+        cost += w;
+        union(u, v);
+
+        drawEdge(u, v, GREEN, 4);
+        await delay(sliderValue());
+        drawNode(u, GREY, GREEN, 4);
+        drawNode(v, GREY, GREEN, 4);
+        await delay(sliderValue());
+    }
+    console.log(cost);
 }
 
 initialize();
