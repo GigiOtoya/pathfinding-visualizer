@@ -174,8 +174,7 @@ function getEdgeKey(node1, node2) {
 
 function setWeight() {
     if (f == 0 || f == 1) return randomInt(1,10);
-    if (f == 2) return randomInt(-10,10);
-    if (f == 3 || f == 4) return 1;
+    if (f == 2 || f == 3 || f == 4) return 1;
     if (f == 5 || f == 6) return randomInt(1,10);
 }
 
@@ -530,7 +529,7 @@ async function runAlgo(e) {
         break;
         case 1 : await floydWarshall(g);
         break;
-        case 2 : await bellmanFord(g.adjacencyList, source ,destination);
+        case 2 : await depthFirstSearchr(g.adjacencyList, source ,destination);
         break;
         case 3 : await depthFirstSearchi(g.adjacencyList, source, destination);
         break;
@@ -806,21 +805,6 @@ function trace(prev, nodes, i, j) {
     }
 }
 
-
-function bellmanFord(g, start, end) {
-    distances = new Map();
-    for (let node of g.keys()) {
-        distances.set(node, Infinity);
-    }
-    distances.set(source, 0);
-
-    let node = start;
-    for (let i = 0; i < g.keys().length-1; i++) {
-
-        const visited = new Set();
-    }
-}
-
 async function depthFirstSearchi(g, start, end) {
     const stack = [start];
     const visited = new Set([start]);
@@ -838,8 +822,6 @@ async function depthFirstSearchi(g, start, end) {
                 visited.add(neighbor);
                 paths.set(neighbor, node);
                 drawEdge(node, neighbor, AZURE, 4);
-                drawNode(node, GREY, AZURE, 4);
-                drawNode(neighbor);
                 await delay(sliderValue());
             }
         }
@@ -848,25 +830,29 @@ async function depthFirstSearchi(g, start, end) {
 }
 
 
-// function depthFirstSearch(g, start, end) {
-//     visited = new Set();
-//     console.log("dfs:");
-//     async function dfs(node) {
-//         visited.add(node);
-//         drawNode(node, GREY, AZURE, 4);
-//         console.log(node);
+async function depthFirstSearchr(g, start, end) {
+    const visited = new Set();
+    const paths = new Map([[start, null]]);
 
-//         for (let neighbor of [...g.get(node).keys()]) {
-//             if (!visited.has(neighbor)) {
-//                 await delay(sliderValue());
-//                 dfs(neighbor);
-//             }
+    console.log("dfs:");
+    async function dfs(node) {
+        visited.add(node);
+        drawNode(node, GREY, AZURE, 4);
+        console.log(node);
+        await delay(sliderValue());
 
-//         }
-//         return;
-//     }
-//     dfs(start);
-// }
+        for (let neighbor of [...g.get(node).keys()]) {
+            if (!visited.has(neighbor)) {
+                drawEdge(node, neighbor, AZURE, 4);
+                paths.set(neighbor, node);
+                await dfs(neighbor);
+            }
+        }
+        return;
+    }
+    await dfs(start);
+    pathTrace(paths, start, end);
+}
 
 async function breadthFirstSearch(g, start, end) {
     const Q = [start];
