@@ -337,15 +337,6 @@ function mouseMove(canvas, e) {
         canvas.style.cursor = "default";
     }
 
-    // if (mouseOnNode(mousePosition.x, mousePosition.y)) {
-    //     onNode = true;
-    //     canvas.style.cursor = "grab";
-    // }
-    // else {
-    //     onNode = false;
-    //     canvas.style.cursor = "default";
-    // }
-    // console.log(drawingEdge);
     if (addingEdge) {
         canvas.style.cursor = "crosshair";
         if (drawingEdge) {
@@ -382,9 +373,7 @@ function mouseDown(e) {
     if (addingEdge) {
         const mousePosition = getMouseCoordinates(e);
         currNode = getNode(mousePosition.x, mousePosition.y);
-        console.log(currNode);
     }
-    console.log(`dragging: ${dragging}, addingEdge: ${addingEdge}`);
 };
 
 // MOUSE CLICK RELEASE
@@ -406,8 +395,6 @@ function mouseUp(e) {
             drawCanvas();
         }
     }
-    
-    console.log(dragging);
 };
 
 
