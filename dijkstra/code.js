@@ -16,6 +16,7 @@ let dragging = false;
 let addingEdge = false;
 let drawingEdge = false;
 let currNode = null;
+let selectable  = true;
 
 let nodes = [];
 let edgeSet = {};
@@ -324,21 +325,26 @@ function Node(x, y, r) {
 // ========================================================================================
 function mouseMove(canvas, e) {
     let mousePosition = getMouseCoordinates(e);
-    // console.log(currNode);
-    // console.log(`x: ${e.clientX}, y: ${e.clientY}`);
-    // console.log(mousePosition);
-    // console.log(boundingRect);
-
     // keep currNode from changing once we have it
-    if (mouseOnNode(mousePosition.x, mousePosition.y)) {
-        onNode = true;
-        canvas.style.cursor = "grab";
+    if (selectable) {
+        onNode = mouseOnNode(mousePosition.x, mousePosition.y);
+    }
+
+    if (onNode) {
+        canvas.style.cursor = "grab"
     }
     else {
-        onNode = false;
-        count = 0;
         canvas.style.cursor = "default";
     }
+
+    // if (mouseOnNode(mousePosition.x, mousePosition.y)) {
+    //     onNode = true;
+    //     canvas.style.cursor = "grab";
+    // }
+    // else {
+    //     onNode = false;
+    //     canvas.style.cursor = "default";
+    // }
     // console.log(drawingEdge);
     if (addingEdge) {
         canvas.style.cursor = "crosshair";
@@ -517,8 +523,9 @@ function enableAll() {
 async function runAlgo(e) {
     e.preventDefault();
     if (nodes.length == 0) return;
-
+    selectable = false;
     disableAll();
+    
     g = buildGraph();
     
     const source = nodes[sourceSelect.value.charCodeAt()-65];
@@ -541,6 +548,7 @@ async function runAlgo(e) {
         break;
     }
     enableAll();
+    selectable = true;
 }
 
 function sliderValue() {
@@ -616,7 +624,6 @@ async function dijkstra(graph, source, destination) {
             visited.add(curNode);
 
             drawNode(curNode, GREY, AZURE, 4);
-            console.log(visited);
             await delay(sliderValue());
 
             for (let [neighbor, weight] of graph.get(curNode)) {
@@ -626,8 +633,6 @@ async function dijkstra(graph, source, destination) {
                     paths.set(neighbor, curNode);
                     heapQ.heapPush([nextWeight, neighbor]);
                     drawEdge(curNode, neighbor, AZURE, 4);
-                    drawNode(curNode, GREY, AZURE, 4);
-                    drawNode(neighbor);
                     await delay(sliderValue());
                 }
             }
@@ -870,8 +875,6 @@ async function breadthFirstSearch(g, start, end) {
                 visited.add(neighbor);
                 paths.set(neighbor, node);
                 drawEdge(node, neighbor, AZURE, 4);
-                drawNode(node, GREY, AZURE, 4);
-                drawNode(neighbor);
                 await delay(sliderValue());
             }
         }
