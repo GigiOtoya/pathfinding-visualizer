@@ -1,3 +1,4 @@
+(function () {
 const canvas = document.getElementById("graph-canvas");
 const boundingRect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext("2d");
@@ -16,7 +17,7 @@ let dragging = false;
 let addingEdge = false;
 let drawingEdge = false;
 let currNode = null;
-let selectable  = true;
+let isRunning  = false;
 
 let nodes = [];
 let edgeSet = {};
@@ -326,7 +327,7 @@ function Node(x, y, r) {
 function mouseMove(canvas, e) {
     let mousePosition = getMouseCoordinates(e);
     // keep currNode from changing once we have it
-    if (selectable) {
+    if (!isRunning) {
         onNode = mouseOnNode(mousePosition.x, mousePosition.y);
     }
 
@@ -351,9 +352,9 @@ function mouseMove(canvas, e) {
         canvas.style.cursor = "grabbing";
         currNode.x = mousePosition.x;
         currNode.y = mousePosition.y;
-        nodes.forEach(node => console.log(`x: ${node.x}, y: ${node.y}`));
+        // nodes.forEach(node => console.log(`x: ${node.x}, y: ${node.y}`));
         // updateEdgeDistance(currNode);
-        console.log(currNode);
+        // console.log(currNode);
         drawCanvas();
     }
 };
@@ -479,38 +480,53 @@ let f = 0;
 const navItems = document.getElementById("nav-items").getElementsByTagName("li");
 for(item of navItems) {
     item.addEventListener("click", function() {
-        for (item of navItems) {
-            item.classList = "";
+        if (!isRunning) {
+            for (item of navItems) {
+                item.classList = "";
+            }
+            this.classList.add("active");
+            f = this.value;
+            adjustWeights();
+            drawCanvas();
         }
-        this.classList.add("active");
-        f = this.value;
-        adjustWeights();
-        drawCanvas();
     });
 }
 
+function toggleNav() {
+    for (item of navItems) {
+        if (isRunning) {
+            item.style.color = "rgb(128, 128, 128";
+        }
+        else {
+            item.style.color = WHITE;
+        }
+    }
+}
+
 function disableAll() {
+    isRunning = true;
+    dragging = false;
+    addingEdge = false;
     nodeBtn.disabled = true;
     edgeBtn.disabled = true;
     runBtn.disabled = true;
     randomBtn.disabled = true;
     clearBtn.disabled = true;
-    dragging = false;
-    addingEdge = false;
-
+    toggleNav();
 }
 function enableAll() {
+    isRunning = false;
     nodeBtn.disabled = false;
     edgeBtn.disabled = false;
     runBtn.disabled = false;
     randomBtn.disabled = false;
     clearBtn.disabled = false;
+    toggleNav();
 }
 
 async function runAlgo(e) {
     e.preventDefault();
     if (nodes.length == 0) return;
-    selectable = false;
     disableAll();
     
     g = buildGraph();
@@ -535,7 +551,6 @@ async function runAlgo(e) {
         break;
     }
     enableAll();
-    selectable = true;
 }
 
 function sliderValue() {
@@ -548,14 +563,18 @@ function randomGraph(e) {
     e.preventDefault();
     resetAll();
 
-    const n = 10;
+    const n = 5;
+    const degree = new Array(n).fill(0);
+    const maxDegree = degree.map(x => randomInt(x+1, n-1));
+    const edgeCount = maxDegree.reduce((prev, cur) => prev+cur);
+
     while (nodes.length < n) {
         const node = new Node(
             randomInt(20, canvas.width-20),
             randomInt(20, canvas.height-20),
             20
         );
-            
+
         let overlapping = false;
 
         for (let j = 0; j < nodes.length; j++) {
@@ -571,14 +590,37 @@ function randomGraph(e) {
         }
     }
 
-    // max edges = n*(n-1)/2
-    while (Object.keys(edgeSet).length < (n*(n-1)/2)) {
-        const node1 = nodes[randomInt(0, nodes.length-1)];
-        const node2 = nodes[randomInt(0, nodes.length-1)];
-        if (node1 != node2) {
-            addToEdgeSet(node1, node2);
+    for (let i = 0; i < nodes.length; i++) {
+        const start = i
+        while (degree[i] < maxDegree[i]) {
+
+            let end = randomInt(0, nodes.length-1);
+
+            if (start == end) {
+                end = randomInt(0, nodes.length-1);
+            }
+            // else if (degree[end] == maxDegree[end]) {
+            //     end = randomInt(0, nodes.length-1);
+            // }
+            else if (Object.hasOwn(edgeSet, getEdgeKey(nodes[start], nodes[end]))) {
+                end = randomInt(0, nodes.length-1);
+            }
+            else {
+                addToEdgeSet(nodes[start], nodes[end]);
+                degree[start]++;
+                degree[end]++;
+            }
         }
     }
+    console.log(degree, maxDegree);
+    // max edges = n*(n-1)/2
+    // while (Object.keys(edgeSet).length < (n*(n-1)/2)) {
+    //     const node1 = nodes[randomInt(0, nodes.length-1)];
+    //     const node2 = nodes[randomInt(0, nodes.length-1)];
+    //     if (node1 != node2) {
+    //         addToEdgeSet(node1, node2);
+    //     }
+    // }
     drawCanvas();
 }
 
@@ -956,3 +998,4 @@ async function kruskal(g) {
 }
 
 initialize();
+})();
