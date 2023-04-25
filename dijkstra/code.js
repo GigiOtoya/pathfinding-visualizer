@@ -102,11 +102,6 @@ function Graph() {
     };
 
     this.addEdgeToGraph = function (source, neighbor) {
-        // const distance = getDistance(source, neighbor);
-        // // distance set for both nodes connected by edge
-        // this.adjacencyList.get(source).set(neighbor, distance);
-        // this.adjacencyList.get(neighbor).set(source, distance);
-
         // set by edge weight
         const edge = edgeSet[getEdgeKey(source, neighbor)]
         this.adjacencyList.get(source).set(neighbor, edge.weight)
@@ -127,11 +122,11 @@ function Graph() {
 // Miscellaneous
 // ========================================================================================
 function setSize() {
-    // const div = document.getElementById("canvas-wrapper");
-    // canvas.width = div.clientWidth;
-    // canvas.height = div.clientHeight;
-    canvas.width = window.innerWidth - boundingRect.x;
-    canvas.height = window.innerHeight - boundingRect.y;
+    const div = document.getElementById("canvas-wrapper");
+    canvas.width = div.clientWidth;
+    canvas.height = div.clientHeight;
+    // canvas.width = window.innerWidth - boundingRect.x;
+    // canvas.height = window.innerHeight - boundingRect.y;
     drawCanvas();
 }
 
@@ -352,9 +347,6 @@ function mouseMove(canvas, e) {
         canvas.style.cursor = "grabbing";
         currNode.x = mousePosition.x;
         currNode.y = mousePosition.y;
-        // nodes.forEach(node => console.log(`x: ${node.x}, y: ${node.y}`));
-        // updateEdgeDistance(currNode);
-        // console.log(currNode);
         drawCanvas();
     }
 };
@@ -612,15 +604,6 @@ function randomGraph(e) {
             }
         }
     }
-    console.log(degree, maxDegree);
-    // max edges = n*(n-1)/2
-    // while (Object.keys(edgeSet).length < (n*(n-1)/2)) {
-    //     const node1 = nodes[randomInt(0, nodes.length-1)];
-    //     const node2 = nodes[randomInt(0, nodes.length-1)];
-    //     if (node1 != node2) {
-    //         addToEdgeSet(node1, node2);
-    //     }
-    // }
     drawCanvas();
 }
 
@@ -845,7 +828,6 @@ async function depthFirstSearchi(g, start, end) {
     const paths = new Map([[start, null]]);
 
     while (stack.length) {
-        console.log([...stack])
         const node = stack.pop();
         drawNode(node, GREY, AZURE, 4);
         await delay(sliderValue());

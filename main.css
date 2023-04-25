@@ -184,3 +184,10 @@ body {
 .active {
     background-color: #336DFF;
 }
+
+.canvas-container {
+    min-width: 500px;
+    min-height: 500px;
+    height: calc(100vh - 60px);
+    width: calc(100vw - 300px);
+}
