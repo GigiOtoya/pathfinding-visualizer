@@ -1,8 +1,4 @@
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
 <html>
     <head>
         <meta charset="utf-8">
@@ -10,27 +6,106 @@
         <title>Pathfinding Visualizer</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="main.css">
     </head>
     <body>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
+
         <nav class="header">
-            <img src="images/logo.svg"/ alt="Graph Logo">
+            <img src="images/logo.svg" alt="Graph Logo"/>
             <h1> Pathfinding Visualizer </h1>
         </nav>
-        <div class="canvas-wrapper">
+        <div id = "main-wrapper" class="main-container">
             <div class="control-panel">
                 <h1> Control Panel </h1>
-                <button id="select-btn"> Select </button>
-                <button id="add-node-btn"> Add Node </button>
-                <button id="add-edge-btn"> Add Edge </button>
+
+                <button id="select-btn" class="control-item big"> Drag </button>
+
+                <div class="adjacent">
+
+                    <button id="add-node-btn" class="control-item small"> 
+                        <img src="images/plus-sign-icon.svg" alt="Play Button" class="icon"/>
+                        Node 
+                    </button>
+
+                    <button id="add-edge-btn" class="control-item small">
+                        <img src="images/plus-sign-icon.svg" alt="Play Button" class="icon"/>
+                        Edge
+                    </button>
+
+                </div>
+
+                <div class="adjacent"> 
+
+                    <button id="run-btn" class="control-item small"> 
+                        <img src="images/playbutton.svg" alt="Play Button" class="icon"/>
+                        Play 
+                    </button>
+                    
+                    <div class="control-item small slider">
+                        <label for="speedcontrol">  </label>
+                        <input
+                            type="range" 
+                            id="speedcontrol" 
+                            class="speed-control"
+                            name="speedcontrol" 
+                            list="values"
+                            min="0"
+                            max="4"
+                            step="1"/>
+                        
+                        <datalist id="values">
+                            <option value="0" label="slow"></option>
+                            <option value="1" ></option>
+                            <option value="2" ></option>
+                            <option value="3" ></option>
+                            <option value="4" label="fast"></option>
+                        </datalist>
+                    </div>
+
+                </div>
+                
+                <button id="random-btn" class="control-item big"> 
+                    Generate Random (5)
+                </button>
+                
+                <button id="clear-btn" class="control-item big"> 
+                    Clear Graph
+                </button>
+
+                <div class="node-selection">
+
+                    <div id="start" class="select">
+                        <label for="source-select"> Start: </label>
+                        <select name="source" id="source-select">
+                        </select>
+                    </div>
+
+                    <div id="end" class="select">
+                        <label for="destination-select"> End: </label>
+                        <select name="destination" id="destination-select">
+                        </select>
+                    </div>
+
+                </div>
+                
+                <ul id="nav-items" class="items">
+                    <li value="0" class="active">Dijkstra Shortest Path</li>
+                    <li value="1">Floyd-Warshall (All-Pairs)</li>
+                    <li value="2">Depth First Search (Recursive)</li>
+                    <li value="3">Depth First Search (Iterative)</li>
+                    <li value="4">Breadth First Search</li>
+                    <li value="5">Prim's Minimum Spanning Tree</li>
+                    <li value="6">Kruskal's Minimum Spanning Tree</li>
+                </ul>
             </div>
-            <canvas id="canvas">
-            
-            </canvas>
+            <div id="canvas-wrapper" class="canvas-container">
+                <canvas id="graph-canvas" class="canvas">
+                </canvas>
+            </div>
         </div>
-        <script src="dijkstra/code.js" async defer></script>
+        <script src="algo/code.js" async defer></script>
     </body>
 </html>
