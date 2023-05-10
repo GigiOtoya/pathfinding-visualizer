@@ -39,9 +39,6 @@ body {
 
 
 .control-panel {
-    /* display: flex;
-    flex-direction: column;
-    flex-wrap: wrap; */
     background-color: #222222;
     width: 300px;
     min-width: 300px;
@@ -76,12 +73,6 @@ body {
 .big {
     width: 100%;
 }
-
-/* #random-btn {
-}
-
-#clear-btn {
-} */
 
 .small {
     width: 50%;

@@ -1,4 +1,6 @@
 (function () {
+
+console.log = function() {};
 const canvas = document.getElementById("graph-canvas");
 const boundingRect = canvas.getBoundingClientRect();
 const ctx = canvas.getContext("2d");
@@ -125,8 +127,6 @@ function setSize() {
     const div = document.getElementById("canvas-wrapper");
     canvas.width = div.clientWidth;
     canvas.height = div.clientHeight;
-    // canvas.width = window.innerWidth - boundingRect.x;
-    // canvas.height = window.innerHeight - boundingRect.y;
     drawCanvas();
 }
 
@@ -244,8 +244,7 @@ function drawEdge(p1, p2, lc=WHITE, lw=2, ls = STRAIGHT_LINE) {
         ctx.moveTo(v.p1.x, v.p1.y);
         ctx.lineTo(v.p2.x, v.p2.y);
     }
-    // ctx.moveTo(p1.x, p1.y);
-    // ctx.lineTo(p2.x, p2.y);
+
     ctx.setLineDash(ls);
     ctx.lineWidth = lw;
     ctx.strokeStyle = lc;
@@ -440,7 +439,6 @@ function addNode(e) {
 
     addToDropDown(node.name, sourceSelect);
     addToDropDown(node.name, destinationSelect);
-    // graph.set(node, new Map());
     drawCanvas();
 };
 
