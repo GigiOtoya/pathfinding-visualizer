@@ -3,7 +3,8 @@
 ## Interactive visualization tool for pathfinding and graph traversal.
 
 This project enables users to create custom graphs and apply various algorithms for pathfinding and graph traversal. 
-Algorithms:
+
+### Algorithms:
 1. Dijkstra Shortest Path
 2. Floyd-Warshall (All-Pairs)
 3. Depth First Search (Recursive)
